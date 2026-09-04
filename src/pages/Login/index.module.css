@@ -1,0 +1,120 @@
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.login-container {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  background-color: #ffffff;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.image-section {
+  flex: 1;
+  background: url("Customer-Service.jpg") no-repeat center center;
+  background-size: cover;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  padding: 32px;
+}
+
+.form-section {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #ffffff;
+}
+
+.form-wrapper {
+  width: 100%;
+  max-width: 60%;
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0052cc;
+  margin-bottom: 24px;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #172b4d;
+  margin: 0 0 8px 0;
+}
+
+.subtitle {
+  font-size: 1.25rem;
+  color: #6b778c;
+  margin: 0 0 32px 0;
+  line-height: 1.4;
+}
+
+.form-section :global(.ant-form-item-label > label) {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #42526e;
+  width: 100%;
+}
+
+.password-label-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.forgot-password {
+  font-size: 1rem;
+  color: #0052cc;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.forgot-password:hover {
+  text-decoration: underline;
+}
+
+.submit-btn {
+  background-color: #0052cc !important;
+  border-color: #0052cc !important;
+  height: 44px;
+  font-weight: 700;
+  font-size: 15px;
+  border-radius: 4px;
+  margin-top: 8px;
+}
+
+.submit-btn:hover {
+  background-color: #0747a6 !important;
+  border-color: #0747a6 !important;
+}
+
+.footer-text {
+  text-align: center;
+  margin-top: 40px;
+  font-size: 1rem;
+  color: #6b778c;
+}
+
+.footer-text a {
+  color: #0052cc;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.footer-text a:hover {
+  text-decoration: underline;
+}
