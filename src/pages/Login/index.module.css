@@ -20,7 +20,7 @@ body {
   position: relative;
   display: flex;
   align-items: flex-end;
-  padding: 32px;
+  padding: 2rem;
 }
 
 .form-section {
@@ -41,24 +41,24 @@ body {
 .brand-header {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
   font-size: 1.5rem;
   font-weight: 700;
   color: #0052cc;
-  margin-bottom: 24px;
+  margin-bottom: 1.5rem;
 }
 
 .title {
   font-size: 1.5rem;
   font-weight: 700;
   color: #172b4d;
-  margin: 0 0 8px 0;
+  margin: 0 0 0.5rem 0;
 }
 
 .subtitle {
   font-size: 1.25rem;
   color: #6b778c;
-  margin: 0 0 32px 0;
+  margin: 0 0 2rem 0;
   line-height: 1.4;
 }
 
@@ -90,11 +90,11 @@ body {
 .submit-btn {
   background-color: #0052cc !important;
   border-color: #0052cc !important;
-  height: 44px;
+  height: 2.75rem;
   font-weight: 700;
-  font-size: 15px;
-  border-radius: 4px;
-  margin-top: 8px;
+  font-size: 0.9375rem;
+  border-radius: 0.25rem;
+  margin-top: 0.5rem;
 }
 
 .submit-btn:hover {
@@ -104,7 +104,7 @@ body {
 
 .footer-text {
   text-align: center;
-  margin-top: 40px;
+  margin-top: 2.5rem;
   font-size: 1rem;
   color: #6b778c;
 }
@@ -117,4 +117,96 @@ body {
 
 .footer-text a:hover {
   text-decoration: underline;
+}
+
+@media (max-width: 992px) {
+  .image-section {
+    flex: 0.8;
+    padding: 1.5rem;
+  }
+
+  .form-section {
+    flex: 1;
+  }
+
+  .form-wrapper {
+    max-width: 75%;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .login-container {
+    min-height: 100vh;
+    height: auto;
+  }
+
+  .image-section {
+    display: none;
+  }
+
+  .form-section {
+    min-height: 100vh;
+    padding: 2rem 1.5rem;
+    box-sizing: border-box;
+  }
+
+  .form-wrapper {
+    max-width: 520px;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-section {
+    align-items: flex-start;
+    padding: 2.5rem 1.25rem;
+  }
+
+  .form-wrapper {
+    max-width: 100%;
+  }
+
+  .brand-header {
+    margin-bottom: 2rem;
+    font-size: 1.35rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .subtitle {
+    font-size: 0.9375rem;
+  }
+
+  .password-label-container {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .forgot-password {
+    font-size: 0.875rem;
+  }
+
+  .footer-text {
+    margin-top: 1.5rem;
+    font-size: 0.875rem;
+  }
+
+  .submit-btn {
+    height: 3rem;
+  }
 }

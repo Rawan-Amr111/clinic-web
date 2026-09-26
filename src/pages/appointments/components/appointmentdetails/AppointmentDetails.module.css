@@ -1,0 +1,265 @@
+.panel {
+  display: flex;
+  min-width: 0;
+  min-height: 100%;
+  flex-direction: column;
+  border-left: 1px solid #d8e1ed;
+  background: #fff;
+}
+
+.header {
+  display: flex;
+  min-height: 64px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.25rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.header div {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: #075fd5;
+}
+
+.header h2 {
+  margin: 0;
+  color: #172033;
+  font-size: 1rem;
+}
+
+.header button {
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.content {
+  flex: 1;
+  padding: 1.25rem;
+}
+
+.patientDetails {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.avatar,
+.doctorAvatar {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: 50%;
+  font-weight: 700;
+}
+
+.avatar {
+  width: 51px;
+  height: 51px;
+  background: #075fd5;
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+.patientDetails h3 {
+  margin: 0;
+  color: #172033;
+  font-size: 1.2rem;
+}
+
+.patientDetails p {
+  margin: 0.22rem 0;
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
+.alert {
+  display: inline-block;
+  padding: 0.23rem 0.42rem;
+  border-radius: 4px;
+  background: #fee2e2;
+  color: #dc2626;
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.contact,
+.statusCard {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+  margin-top: 1.25rem;
+}
+
+.contact {
+  padding: 0.9rem;
+  border-top: 1px solid #e5ebf3;
+  border-bottom: 1px solid #e5ebf3;
+}
+
+.contact div,
+.statusCard div {
+  display: flex;
+  flex-direction: column;
+}
+
+.contact span,
+.statusCard span,
+.context article > span {
+  color: #64748b;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.contact strong,
+.statusCard strong {
+  margin-top: 0.22rem;
+  color: #172033;
+  font-size: 0.82rem;
+}
+
+.statusCard {
+  padding: 0.9rem;
+  border: 1px solid #d8e1ed;
+  border-radius: 9px;
+}
+
+.green {
+  color: #00875a !important;
+}
+
+.progress {
+  grid-column: 1 / -1;
+  height: 5px;
+  border-radius: 999px;
+  background: #d1fae5;
+}
+
+.progress span {
+  display: block;
+  width: 45%;
+  height: 100%;
+  border-radius: inherit;
+  background: #00966c;
+}
+
+.statusCard small {
+  grid-column: 1 / -1;
+  margin-top: -0.45rem;
+  color: #64748b;
+  font-size: 0.68rem;
+  text-align: right;
+}
+
+.context,
+.actions {
+  margin-top: 1.35rem;
+}
+
+.context h3,
+.actions h3 {
+  margin: 0;
+  color: #172033;
+  font-size: 1.1rem;
+}
+
+.context article {
+  margin-top: 0.7rem;
+  padding: 0.85rem;
+  border: 1px solid #d8e1ed;
+  border-radius: 9px;
+}
+
+.context article p {
+  margin: 0.3rem 0 0;
+  color: #475569;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.physician {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.doctorAvatar {
+  width: 31px;
+  height: 31px;
+  background: #dbeafe;
+  color: #075fd5;
+  font-size: 0.66rem;
+}
+
+.physician div {
+  display: flex;
+  flex-direction: column;
+}
+
+.physician small,
+.physician span {
+  color: #64748b;
+  font-size: 0.66rem;
+}
+
+.physician strong {
+  margin: 0.12rem 0;
+  color: #172033;
+  font-size: 0.82rem;
+}
+
+.actions > div {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+  margin-top: 0.7rem;
+}
+
+.actions button {
+  display: flex;
+  min-height: 60px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  border: 1px solid #d8e1ed;
+  border-radius: 8px;
+  background: #fff;
+  color: #475569;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.footer {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.footer button {
+  display: flex;
+  width: 100%;
+  min-height: 43px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  border: 0;
+  border-radius: 7px;
+  background: #075fd5;
+  color: #fff;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media (max-width: 850px) {
+  .panel {
+    border-top: 1px solid #d8e1ed;
+    border-left: 0;
+  }
+}

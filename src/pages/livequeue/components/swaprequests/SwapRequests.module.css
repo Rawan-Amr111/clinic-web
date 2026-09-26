@@ -1,0 +1,123 @@
+.card {
+  overflow: hidden;
+  border: 1px solid #d5deeb;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1rem 0.85rem;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: #475569;
+}
+
+.title h2 {
+  margin: 0;
+  color: #172033;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.newBadge {
+  padding: 0.35rem 0.55rem;
+  border-radius: 999px;
+  background: #d71920;
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+}
+
+.requests {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  padding: 0 0.8rem 0.9rem;
+}
+
+.request {
+  padding: 0.7rem;
+  border: 1px solid #e1e7ef;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.requestInfo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.requestInfo strong {
+  color: #172033;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.requestInfo time {
+  color: #64748b;
+  font-size: 0.65rem;
+  white-space: nowrap;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
+  margin-top: 0.6rem;
+}
+
+.actions button {
+  height: 31px;
+  border: 0;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.approve {
+  background: #075fd5;
+  color: #fff;
+}
+
+.approve:hover {
+  background: #004db1;
+}
+
+.deny {
+  background: #e9edf2;
+  color: #475569;
+}
+
+.deny:hover {
+  background: #dce3eb;
+  color: #172033;
+}
+
+.emptyState {
+  margin: 0;
+  padding: 1rem 0.25rem;
+  color: #64748b;
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+@media (max-width: 500px) {
+  .title h2 {
+    font-size: 1rem;
+  }
+
+  .requestInfo strong {
+    font-size: 0.72rem;
+  }
+}

@@ -1,0 +1,183 @@
+.card {
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #c7d2e3;
+  border-radius: 16px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 78px;
+  padding: 0 1.45rem;
+  border-bottom: 1px solid #dfe7f1;
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  color: #0057d8;
+}
+
+.heading h2 {
+  margin: 0;
+  color: #172033;
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.viewAll {
+  padding: 0;
+  color: #2563eb;
+  font-size: 1.05rem;
+  font-weight: 700;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.queue {
+  padding: 0 1.55rem;
+}
+
+.queueItem {
+  display: grid;
+  grid-template-columns: 54px minmax(150px, 1fr) auto 95px;
+  align-items: center;
+  gap: 0.9rem;
+  min-height: 100px;
+}
+
+.number {
+  display: grid;
+  width: 54px;
+  height: 54px;
+  place-items: center;
+  border-radius: 50%;
+  background: #e1e5e8;
+  color: #334155;
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.queueItem:nth-child(2) .number {
+  background: #d4e5ff;
+  color: #0057d8;
+}
+
+.patientInfo h3,
+.patientInfo p {
+  margin: 0;
+}
+
+.patientInfo h3 {
+  color: #111827;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.patientInfo p {
+  margin-top: 0.25rem;
+  color: #34435b;
+  font-size: 1.1rem;
+  font-weight: 400;
+}
+
+.status {
+  padding: 0.35rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.inProgress {
+  color: #00875a;
+  background: #dff5ed;
+}
+
+.waiting,
+.checkedIn {
+  color: #34435b;
+  background: #e2e6ea;
+}
+
+.time {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 95px;
+}
+
+.time strong {
+  color: #111827;
+  font-size: 1.05rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.time span {
+  margin-top: 0.25rem;
+  color: #34435b;
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+
+.time .late {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+@media (max-width: 700px) {
+  .header {
+    min-height: 64px;
+    padding: 0 1rem;
+  }
+
+  .heading h2 {
+    font-size: 1.3rem;
+  }
+
+  .queue {
+    padding: 0 1rem;
+  }
+
+  .queueItem {
+    grid-template-columns: 45px minmax(0, 1fr) 76px;
+    gap: 0.65rem;
+    min-height: 85px;
+  }
+
+  .number {
+    width: 45px;
+    height: 45px;
+    font-size: 1rem;
+  }
+
+  .patientInfo h3 {
+    font-size: 1rem;
+  }
+
+  .patientInfo p {
+    font-size: 0.82rem;
+  }
+
+  .status {
+    display: none;
+  }
+
+  .time {
+    min-width: 0;
+  }
+
+  .time strong {
+    font-size: 0.8rem;
+  }
+
+  .time span {
+    font-size: 0.75rem;
+  }
+}

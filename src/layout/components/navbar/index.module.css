@@ -1,0 +1,74 @@
+.navbar {
+  width: 100%;
+  height: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-inline: 1.25rem;
+  background-color: #ffffff;
+  border-block-end: 2px solid #e2e8f0;
+  box-sizing: border-box;
+  justify-content: flex-end;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.iconButton {
+  width: 2.25rem;
+  height: 2.5rem;
+  border: none;
+  background-color: transparent;
+  color: #475569;
+  font-size: 1.25rem;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.iconButton:hover {
+  background-color: #f1f5f9;
+}
+
+.avatar {
+  width: 2rem;
+  height: 2rem;
+  cursor: pointer;
+}
+
+@media (max-width: 1100px) {
+  .navbar {
+    height: 3.75rem;
+    padding-inline: 1rem;
+  }
+}
+
+@media (max-width: 800px) {
+  .navbar {
+    padding-inline: 0.8rem;
+  }
+
+  .actions {
+    gap: 0.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    height: 3.5rem;
+    padding-inline: 0.6rem;
+  }
+
+  .iconButton {
+    width: 2rem;
+    height: 2rem;
+    font-size: 1.1rem;
+  }
+
+  .avatar {
+    width: 1.8rem;
+    height: 1.8rem;
+  }
+}

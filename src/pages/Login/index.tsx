@@ -1,5 +1,5 @@
 import type { FormProps } from "antd";
-import { Button, Form, Input } from "antd";
+import { Button, Form, Input, message } from "antd";
 import {
   UserOutlined,
   LockOutlined,
@@ -7,7 +7,8 @@ import {
 } from "@ant-design/icons";
 import classes from "./index.module.css";
 import { supabase } from "../../lib/connect";
-
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 type FieldType = {
   username?: string;
   password?: string;
@@ -15,29 +16,47 @@ type FieldType = {
 
 function Login() {
   const [form] = Form.useForm();
-
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const onFinish: FormProps<FieldType>["onFinish"] = async (values) => {
     if (!values.username || !values.password) return;
 
-    const { data, error } = await supabase.functions.invoke("login", {
-      body: {
-        username: values.username,
-        password: values.password,
-      },
-    });
+    setLoading(true);
 
-    if (error) {
-      console.error("Login failed:", error.message);
-      return;
+    try {
+      const { data, error } = await supabase.functions.invoke("login", {
+        body: {
+          username: values.username,
+          password: values.password,
+        },
+      });
+
+      if (error || !data?.session) {
+        message.error("Invalid username or password.");
+        return;
+      }
+
+      const { error: sessionError } = await supabase.auth.setSession({
+        access_token: data.session.access_token,
+        refresh_token: data.session.refresh_token,
+      });
+
+      if (sessionError) {
+        message.error("Unable to start your session. Please try again.");
+        return;
+      }
+
+      message.success("Login successful.");
+      navigate("/dashboard");
+    } catch {
+      message.error("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
-
-    console.log("Login successful:", data);
   };
 
-  const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (
-    errorInfo,
-  ) => {
-    console.log("Failed:", errorInfo);
+  const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = () => {
+    message.error("Please enter your username and password.");
   };
 
   return (
@@ -104,6 +123,7 @@ function Login() {
                 type="primary"
                 htmlType="submit"
                 block
+                loading={loading}
                 className={classes["submit-btn"]}
               >
                 Sign In

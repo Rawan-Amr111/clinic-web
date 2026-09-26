@@ -1,0 +1,65 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.titleContent h1,
+.titleContent p {
+  margin: 0;
+}
+
+.titleContent h1 {
+  color: #111827;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.titleContent p {
+  margin-top: 0.3rem;
+  color: #64748b;
+  font-size: 1rem;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 1.6rem;
+  padding-bottom: 1.3rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.filters button {
+  display: flex;
+  min-height: 39px;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0 0.8rem;
+  border: 1px solid #d7dfeb;
+  border-radius: 8px;
+  background: #fff;
+  color: #475569;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.filters button:hover {
+  border-color: #93c5fd;
+  background: #eff6ff;
+  color: #075fd5;
+}
+
+@media (max-width: 650px) {
+  .header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .titleContent h1 {
+    font-size: 1.65rem;
+  }
+}

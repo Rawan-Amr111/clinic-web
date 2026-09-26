@@ -1,0 +1,108 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.35rem;
+}
+
+.titleContent h1,
+.titleContent p {
+  margin: 0;
+}
+
+.titleContent h1 {
+  color: #111827;
+  font-size: 1.85rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.titleContent p {
+  margin-top: 0.28rem;
+  color: #475569;
+  font-size: 1rem;
+}
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.filter {
+  position: relative;
+}
+
+.filter::after {
+  position: absolute;
+  top: 50%;
+  right: 0.8rem;
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid #475569;
+  border-bottom: 2px solid #475569;
+  pointer-events: none;
+  content: "";
+  transform: translateY(-70%) rotate(45deg);
+}
+
+.filter select {
+  width: 165px;
+  height: 40px;
+  padding: 0 2rem 0 0.85rem;
+  appearance: none;
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
+  outline: 0;
+  background: #fff;
+  color: #172033;
+  font-family: inherit;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.filter select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgb(37 99 235 / 12%);
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+@media (max-width: 700px) {
+  .header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .filters {
+    width: 100%;
+  }
+
+  .filter {
+    flex: 1;
+  }
+
+  .filter select {
+    width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  .filters {
+    flex-direction: column;
+  }
+
+  .filter {
+    width: 100%;
+  }
+}

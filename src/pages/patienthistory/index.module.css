@@ -1,0 +1,88 @@
+.page {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 2rem;
+}
+
+.accessAlert {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 46px;
+  margin-bottom: 20px;
+  border-radius: 7px;
+  background: #dfe3e6;
+  padding: 10px 16px;
+  color: #52627a;
+  font-size: 13px;
+}
+
+.accessAlert span {
+  color: #0052cc;
+  font-size: 17px;
+}
+
+.accessAlert p {
+  margin: 0;
+}
+
+.accessAlert strong {
+  color: #172b4d;
+}
+
+.contentSection {
+  margin-top: 24px;
+}
+
+.tabs {
+  display: flex;
+  gap: 30px;
+  border-bottom: 1px solid #dfe1e6;
+}
+
+.tabs button {
+  position: relative;
+  border: 0;
+  background: transparent;
+  padding: 0 3px 14px;
+  color: #6b778c;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.tabs button:hover,
+.tabs .activeTab {
+  color: #0052cc;
+}
+
+.tabs .activeTab::after {
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: #0052cc;
+  content: "";
+}
+
+.tabContent {
+  padding-top: 24px;
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 18px 16px 34px;
+  }
+
+  .accessAlert {
+    align-items: flex-start;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .tabs {
+    gap: 20px;
+  }
+}

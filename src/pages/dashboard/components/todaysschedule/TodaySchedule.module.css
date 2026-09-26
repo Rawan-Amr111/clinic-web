@@ -1,0 +1,155 @@
+.card {
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #c7d2e3;
+  border-radius: 16px;
+  padding: 1.35rem 1.45rem;
+  margin-block-end: 1.5rem;
+}
+
+.header {
+  padding-bottom: 1.35rem;
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  color: #0057d8;
+}
+
+.heading h2 {
+  margin: 0;
+  color: #111827;
+  font-size: 1.7rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.timeline {
+  position: relative;
+}
+
+.timeline::before {
+  position: absolute;
+  top: 1rem;
+  bottom: 1rem;
+  left: 2.7rem;
+  width: 2px;
+  background: #edf0f5;
+  content: "";
+}
+
+.scheduleItem {
+  position: relative;
+  display: grid;
+  grid-template-columns: 78px 20px minmax(0, 1fr);
+  gap: 0.55rem;
+  align-items: start;
+  min-height: 120px;
+}
+
+.scheduleItem:last-child {
+  min-height: 68px;
+}
+
+.scheduleItem time {
+  padding-top: 0.5rem;
+  color: #34435b;
+  font-size: 1rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.scheduleItem:nth-child(2) time {
+  color: #0057d8;
+}
+
+.dot {
+  z-index: 1;
+  width: 13px;
+  height: 13px;
+  margin-top: 0.56rem;
+  border: 2px solid #cbd5e1;
+  border-radius: 50%;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.activeDot {
+  border: 3px solid #dceaff;
+  background: #0057d8;
+  box-shadow: 0 0 0 1px #0057d8;
+}
+
+.event {
+  padding: 1rem 1rem;
+  border: 1px solid #d7dee9;
+  border-radius: 11px;
+  background: #f4f6f8;
+}
+
+.blueEvent {
+  border-color: #b9d3ff;
+  background: #f5f9ff;
+  box-shadow: 0 2px 4px rgb(37 99 235 / 8%);
+}
+
+.event strong,
+.event span {
+  display: block;
+}
+
+.event strong {
+  color: #111827;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.blueEvent strong {
+  color: #0057d8;
+}
+
+.event span {
+  margin-top: 0.25rem;
+  color: #475569;
+  font-size: 0.95rem;
+  line-height: 1.2;
+}
+
+@media (max-width: 500px) {
+  .card {
+    padding: 1rem;
+  }
+
+  .heading h2 {
+    font-size: 1.35rem;
+  }
+
+  .scheduleItem {
+    grid-template-columns: 66px 17px minmax(0, 1fr);
+    gap: 0.4rem;
+    min-height: 100px;
+  }
+
+  .timeline::before {
+    left: 2.25rem;
+  }
+
+  .scheduleItem time {
+    font-size: 0.8rem;
+  }
+
+  .event {
+    padding: 0.75rem;
+  }
+
+  .event strong {
+    font-size: 0.9rem;
+  }
+
+  .event span {
+    font-size: 0.8rem;
+  }
+}
