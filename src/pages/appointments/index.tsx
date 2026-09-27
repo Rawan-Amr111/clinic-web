@@ -1,43 +1,41 @@
 import React, { useState } from "react";
-import type { Appointment } from "../../domain/appointment";
+import type { Appointment, AppointmentStatus } from "../../domain/appointment";
 import AppointmentHeader from "./components/appointmentheader/AppointmentHeader";
 import AppointmentList from "./components/appointmentlist/AppointmentList";
 import AppointmentDetails from "./components/appointmentdetails/AppointmentDetails";
 import classes from "./index.module.css";
-
-const appointments: Appointment[] = [
-  {
-    id: 1,
-    time: "09:00 AM",
-    duration: "45 min",
-    patient: "Eleanor Vance",
-    initials: "EV",
-    patientId: "PT-8821",
-    doctor: "Dr. Sarah Chen",
-    department: "Cardiology",
-    status: "In Progress",
-    phone: "(555) 123-4567",
-    dob: "May 12, 1989",
-  },
-  {
-    id: 2,
-    time: "09:30 AM",
-    duration: "30 min",
-    patient: "Marcus Lloyd",
-    initials: "ML",
-    patientId: "PT-4492",
-    doctor: "Dr. James Wilson",
-    department: "General Practice",
-    status: "Waiting",
-    phone: "(555) 987-3421",
-    dob: "Nov 08, 1992",
-  },
-];
+import { getAppointments } from "../../services/appointment";
+import { useQuery } from "@tanstack/react-query";
+import { type Dayjs } from "dayjs";
 
 const AppointmentsPage: React.FC = () => {
   const [selectedAppointment, setSelectedAppointment] =
     useState<Appointment | null>(null);
+  const [status, setStatus] = useState<AppointmentStatus | "">("");
+  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
 
+  const dateFilter = selectedDate?.format("YYYY-MM-DD") ?? null;
+  const {
+    data: appointments = [],
+    isLoading,
+    isError,
+    error,
+  } = useQuery<Appointment[]>({
+    queryKey: ["appointments", dateFilter, status],
+    queryFn: () =>
+      getAppointments({
+        date: dateFilter,
+        status,
+      }),
+    staleTime: 60 * 1000,
+  });
+  if (isLoading) {
+    return <p>Loading appointments...</p>;
+  }
+
+  if (isError) {
+    return <p>{error.message}</p>;
+  }
   return (
     <main
       className={`${classes.container} ${
@@ -45,7 +43,12 @@ const AppointmentsPage: React.FC = () => {
       }`}
     >
       <section className={classes.leftSide}>
-        <AppointmentHeader />
+        <AppointmentHeader
+          status={status}
+          selectedDate={selectedDate}
+          onStatusChange={setStatus}
+          onDateChange={setSelectedDate}
+        />
 
         <AppointmentList
           appointments={appointments}

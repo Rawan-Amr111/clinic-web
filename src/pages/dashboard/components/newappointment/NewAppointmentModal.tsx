@@ -4,13 +4,18 @@ import {
   CalendarPlus,
   Check,
   Clock3,
-  Save,
   Search,
   UserRoundPlus,
   X,
   Zap,
 } from "lucide-react";
+import { Input } from "antd";
+import { useQuery } from "@tanstack/react-query";
 import classes from "./NewAppointmentModal.module.css";
+import type { Patient } from "../../../../domain/patient";
+import { getPatientByCode } from "../../../../services/patients";
+import { getActiveDoctors } from "../../../../services/doctors";
+import type { Doctor } from "../../../../domain/doctor";
 
 type NewAppointmentModalProps = {
   onClose: () => void;
@@ -22,7 +27,34 @@ const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
   const [visitType, setVisitType] = useState("General");
   const [addToQueue, setAddToQueue] = useState(true);
 
-  const handleSubmit = () => {};
+  const [patientCodeInput, setPatientCodeInput] = useState("");
+  const [searchedPatientCode, setSearchedPatientCode] = useState("");
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+
+  const [department, setDepartment] = useState("");
+  const [doctorId, setDoctorId] = useState("");
+
+  const { data: doctors = [], isLoading: isLoadingDoctors } = useQuery<
+    Doctor[]
+  >({
+    queryKey: ["active-doctors"],
+    queryFn: getActiveDoctors,
+  });
+
+  const departments = [...new Set(doctors.map((doctor) => doctor.specialty))];
+
+  const filteredDoctors = doctors.filter(
+    (doctor) => doctor.specialty === department,
+  );
+  const { data: foundPatient, isFetching: isSearchingPatient } = useQuery({
+    queryKey: ["patient-by-code", searchedPatientCode],
+    queryFn: () => getPatientByCode(searchedPatientCode),
+    enabled: Boolean(searchedPatientCode),
+  });
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+  };
 
   return (
     <div className={classes.overlay} onMouseDown={onClose}>
@@ -70,43 +102,141 @@ const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
 
           <label className={classes.searchInput}>
             <Search size={17} />
-            <input defaultValue="Eleanor Vance" aria-label="Search patient" />
+
+            <Input
+              value={patientCodeInput}
+              onChange={(event) => setPatientCodeInput(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+
+                  setSelectedPatient(null);
+                  setSearchedPatientCode(patientCodeInput.trim().toUpperCase());
+                }
+              }}
+              placeholder="Search by patient code, e.g. PT-84729"
+              aria-label="Search patient by code"
+            />
           </label>
 
-          <div className={classes.selectedPatient}>
-            <span className={classes.patientAvatar}>EV</span>
+          {isSearchingPatient && <p>Searching for patient...</p>}
 
-            <div className={classes.patientInfo}>
-              <div>
-                <strong>Eleanor Vance</strong>
-                <span className={classes.patientId}>ID: PT-8821</span>
+          {searchedPatientCode && !isSearchingPatient && !foundPatient && (
+            <p>No patient found with this code.</p>
+          )}
+
+          {foundPatient && !selectedPatient && (
+            <div className={classes.selectedPatient}>
+              <span className={classes.patientAvatar}>
+                {foundPatient.full_name
+                  .split(" ")
+                  .map((part) => part[0])
+                  .join("")
+                  .slice(0, 2)}
+              </span>
+
+              <div className={classes.patientInfo}>
+                <div>
+                  <strong>{foundPatient.full_name}</strong>
+                  <span className={classes.patientId}>
+                    ID: {foundPatient.patient_code}
+                  </span>
+                </div>
+
+                <p>
+                  {foundPatient.gender} ·{" "}
+                  {foundPatient.phone ?? "No phone number"}
+                </p>
               </div>
 
-              <p>Female, 34 yrs • Insurance Active</p>
+              <button
+                type="button"
+                className={classes.removePatient}
+                onClick={() => setSelectedPatient(foundPatient)}
+                aria-label="Select patient"
+              >
+                <Check size={17} />
+              </button>
             </div>
+          )}
 
-            <button type="button" className={classes.removePatient}>
-              <X size={17} />
-            </button>
-          </div>
+          {selectedPatient && (
+            <div className={classes.selectedPatient}>
+              <span className={classes.patientAvatar}>
+                {selectedPatient.full_name
+                  .split(" ")
+                  .map((part) => part[0])
+                  .join("")
+                  .slice(0, 2)}
+              </span>
+
+              <div className={classes.patientInfo}>
+                <div>
+                  <strong>{selectedPatient.full_name}</strong>
+                  <span className={classes.patientId}>
+                    ID: {selectedPatient.patient_code}
+                  </span>
+                </div>
+
+                <p>
+                  {selectedPatient.gender} ·{" "}
+                  {selectedPatient.phone ?? "No phone number"}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                className={classes.removePatient}
+                onClick={() => {
+                  setSelectedPatient(null);
+                  setPatientCodeInput("");
+                  setSearchedPatientCode("");
+                }}
+                aria-label="Remove selected patient"
+              >
+                <X size={17} />
+              </button>
+            </div>
+          )}
 
           <div className={classes.fieldsGrid}>
             <label className={classes.field}>
               <span>Department</span>
-              <select defaultValue="General Practice">
-                <option>General Practice</option>
-                <option>Cardiology</option>
-                <option>Dermatology</option>
+
+              <select
+                value={department}
+                onChange={(event) => {
+                  setDepartment(event.target.value);
+                  setDoctorId("");
+                }}
+              >
+                <option value="">Select department</option>
+
+                {departments.map((specialty) => (
+                  <option key={specialty} value={specialty}>
+                    {specialty}
+                  </option>
+                ))}
               </select>
             </label>
 
             <label className={classes.field}>
               <span>Attending Doctor</span>
-              <select defaultValue="Dr. Smith">
-                <option value="Dr. Smith">
-                  Dr. Smith (General Practice • Available)
+
+              <select
+                value={doctorId}
+                onChange={(event) => setDoctorId(event.target.value)}
+                disabled={!department || isLoadingDoctors}
+              >
+                <option value="">
+                  {isLoadingDoctors ? "Loading doctors..." : "Select doctor"}
                 </option>
-                <option>Dr. Lee (General Practice • Available)</option>
+
+                {filteredDoctors.map((doctor) => (
+                  <option key={doctor.id} value={doctor.id}>
+                    {doctor.name} ({doctor.specialty})
+                  </option>
+                ))}
               </select>
             </label>
 
@@ -170,7 +300,9 @@ const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
 
             <button
               type="button"
-              className={`${classes.toggle} ${addToQueue ? classes.toggleOn : ""}`}
+              className={`${classes.toggle} ${
+                addToQueue ? classes.toggleOn : ""
+              }`}
               onClick={() => setAddToQueue((value) => !value)}
               aria-label="Toggle direct queue insertion"
             >
@@ -185,11 +317,6 @@ const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
         </main>
 
         <footer className={classes.footer}>
-          <button type="button" className={classes.draftButton}>
-            <Save size={14} />
-            Save as draft
-          </button>
-
           <div className={classes.footerActions}>
             <button
               type="button"

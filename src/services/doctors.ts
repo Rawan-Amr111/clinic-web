@@ -82,18 +82,22 @@ export const updateDoctorStatus = async (
 type AddDoctorParams = {
   name: string;
   specialty: string;
+  image?: File;
 };
 
 export const addDoctor = async ({
   name,
   specialty,
+  image,
 }: AddDoctorParams): Promise<Doctor> => {
+  const imageUrl = image ? await uploadDoctorAvatar(image) : null;
   const { data, error } = await supabase
     .from("doctors")
     .insert({
       name: name.trim(),
       specialty: specialty.trim(),
       status: "Active",
+      image: imageUrl,
     })
     .select()
     .single();
@@ -103,4 +107,43 @@ export const addDoctor = async ({
   }
 
   return data as Doctor;
+};
+
+export const uploadDoctorAvatar = async (file: File): Promise<string> => {
+  const extension = file.name.split(".").pop() || "jpg";
+
+  const filePath = `avatars/${crypto.randomUUID()}.${extension}`;
+
+  const { error } = await supabase.storage
+    .from("doctor-avatars")
+    .upload(filePath, file, {
+      cacheControl: "3600",
+      contentType: file.type,
+      upsert: false,
+    });
+
+  if (error) {
+    console.error("Avatar upload error:", error);
+    throw error;
+  }
+
+  const { data } = supabase.storage
+    .from("doctor-avatars")
+    .getPublicUrl(filePath);
+
+  return data.publicUrl;
+};
+
+// doctors.ts
+
+export const getActiveDoctors = async (): Promise<Doctor[]> => {
+  const { data, error } = await supabase
+    .from("doctors")
+    .select("*")
+    .eq("status", "Active")
+    .order("name");
+
+  if (error) throw error;
+
+  return (data ?? []) as Doctor[];
 };

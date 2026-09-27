@@ -69,3 +69,17 @@ export function formatMonthYear(dateString: string) {
     year: "numeric",
   });
 }
+
+export const getPatientByCode = async (
+  patientCode: string,
+): Promise<Patient | null> => {
+  const { data, error } = await supabase
+    .from("patients")
+    .select("*")
+    .eq("patient_code", patientCode)
+    .maybeSingle();
+
+  if (error) throw error;
+
+  return data as Patient | null;
+};

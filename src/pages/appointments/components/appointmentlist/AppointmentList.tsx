@@ -5,8 +5,16 @@ import classes from "./AppointmentList.module.css";
 
 type AppointmentListProps = {
   appointments: Appointment[];
-  selectedId: number | null;
+  selectedId: string | null;
   onSelect: (appointment: Appointment) => void;
+};
+
+const getStatusClass = (status: Appointment["status"]) => {
+  if (status === "In Progress") return classes.inProgress;
+  if (status === "Completed") return classes.completed;
+  if (status === "Cancelled") return classes.cancelled;
+
+  return classes.waiting;
 };
 
 const AppointmentList: React.FC<AppointmentListProps> = ({
@@ -14,6 +22,7 @@ const AppointmentList: React.FC<AppointmentListProps> = ({
   selectedId,
   onSelect,
 }) => {
+  console.log("Appointments rendered in page:", appointments);
   return (
     <section>
       <div className={classes.tableHeader}>
@@ -53,11 +62,9 @@ const AppointmentList: React.FC<AppointmentListProps> = ({
             </div>
 
             <span
-              className={`${classes.status} ${
-                appointment.status === "In Progress"
-                  ? classes.inProgress
-                  : classes.waiting
-              }`}
+              className={`${classes.status} ${getStatusClass(
+                appointment.status,
+              )}`}
             >
               {appointment.status}
             </span>

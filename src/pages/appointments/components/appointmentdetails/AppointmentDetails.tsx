@@ -1,13 +1,8 @@
 import React from "react";
-import {
-  CalendarDays,
-  Check,
-  FileText,
-  RotateCcw,
-  X,
-} from "lucide-react";
+import { CalendarDays, Check, FileText, RotateCcw, X } from "lucide-react";
 import type { Appointment } from "../../../../domain/appointment";
 import classes from "./AppointmentDetails.module.css";
+import { calculateAge } from "../../../../services/patients";
 
 type AppointmentDetailsProps = {
   appointment: Appointment;
@@ -37,8 +32,9 @@ const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({
 
           <div>
             <h3>{appointment.patient}</h3>
-            <p>ID: {appointment.patientId} • Female, 34 yrs</p>
-            <span className={classes.alert}>⚠ Penicillin Allergy</span>
+            <p>
+              ID: {appointment.patientId} • {calculateAge(appointment.dob)}
+            </p>
           </div>
         </div>
 
@@ -54,32 +50,14 @@ const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({
           </div>
         </div>
 
-        <div className={classes.statusCard}>
-          <div>
-            <span>Current Status</span>
-            <strong className={classes.green}>In Progress</strong>
-          </div>
-
-          <div>
-            <span>Duration</span>
-            <strong>09:00 - 09:45 AM</strong>
-          </div>
-
-          <div className={classes.progress}>
-            <span />
-          </div>
-
-          <small>20 mins remaining</small>
-        </div>
-
         <section className={classes.context}>
           <h3>Visit Context</h3>
 
           <article>
             <span>Reason for Visit</span>
             <p>
-              Follow-up for mild chest palpitations reported during last
-              week's general checkup. Holter monitor results review.
+              Follow-up for mild chest palpitations reported during last week's
+              general checkup. Holter monitor results review.
             </p>
           </article>
 
@@ -112,10 +90,21 @@ const AppointmentDetails: React.FC<AppointmentDetailsProps> = ({
       </div>
 
       <footer className={classes.footer}>
-        <button type="button">
-          <Check size={18} />
-          Complete Appointment
-        </button>
+        {appointment.status === "Completed" ? (
+          <button type="button" disabled>
+            <Check size={18} />
+            Completed
+          </button>
+        ) : appointment.status === "Cancelled" ? (
+          <span className={classes.cancelledMessage}>
+            This appointment was cancelled.
+          </span>
+        ) : (
+          <button type="button">
+            <Check size={18} />
+            Complete Appointment
+          </button>
+        )}
       </footer>
     </aside>
   );

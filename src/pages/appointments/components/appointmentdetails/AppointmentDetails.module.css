@@ -88,8 +88,7 @@
   font-weight: 700;
 }
 
-.contact,
-.statusCard {
+.contact {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.8rem;
@@ -102,14 +101,12 @@
   border-bottom: 1px solid #e5ebf3;
 }
 
-.contact div,
-.statusCard div {
+.contact div{
   display: flex;
   flex-direction: column;
 }
 
 .contact span,
-.statusCard span,
 .context article > span {
   color: #64748b;
   font-size: 0.68rem;
@@ -117,44 +114,10 @@
   text-transform: uppercase;
 }
 
-.contact strong,
-.statusCard strong {
+.contact strong {
   margin-top: 0.22rem;
   color: #172033;
   font-size: 0.82rem;
-}
-
-.statusCard {
-  padding: 0.9rem;
-  border: 1px solid #d8e1ed;
-  border-radius: 9px;
-}
-
-.green {
-  color: #00875a !important;
-}
-
-.progress {
-  grid-column: 1 / -1;
-  height: 5px;
-  border-radius: 999px;
-  background: #d1fae5;
-}
-
-.progress span {
-  display: block;
-  width: 45%;
-  height: 100%;
-  border-radius: inherit;
-  background: #00966c;
-}
-
-.statusCard small {
-  grid-column: 1 / -1;
-  margin-top: -0.45rem;
-  color: #64748b;
-  font-size: 0.68rem;
-  text-align: right;
 }
 
 .context,

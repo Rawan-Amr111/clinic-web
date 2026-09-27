@@ -87,6 +87,7 @@ const DoctorsPage: React.FC = () => {
     createDoctor({
       name: doctor.name,
       specialty: doctor.specialty,
+      image: doctor.image,
     });
   };
   if (isLoading) {

@@ -1,7 +1,11 @@
-export type AppointmentStatus = "In Progress" | "Waiting";
+export type AppointmentStatus =
+  | "Waiting"
+  | "In Progress"
+  | "Completed"
+  | "Cancelled";
 
 export type Appointment = {
-  id: number;
+  id: string;
   time: string;
   duration: string;
   patient: string;
@@ -10,6 +14,23 @@ export type Appointment = {
   doctor: string;
   department: string;
   status: AppointmentStatus;
-  phone: string;
+  phone: string | null;
   dob: string;
+};
+
+export type AppointmentRow = {
+  id: string;
+  appointment_at: string;
+  duration_minutes: number;
+  status: AppointmentStatus;
+  patients: {
+    full_name: string;
+    patient_code: string;
+    phone: string | null;
+    date_of_birth: string;
+  };
+  doctors: {
+    name: string;
+    specialty: string;
+  };
 };

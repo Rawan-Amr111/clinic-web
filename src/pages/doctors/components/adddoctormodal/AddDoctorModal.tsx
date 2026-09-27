@@ -6,7 +6,7 @@ import { AutoComplete } from "antd";
 export type NewDoctorData = {
   name: string;
   specialty: string;
-  image?: string;
+  image?: File;
 };
 
 type AddDoctorModalProps = {
@@ -24,11 +24,17 @@ const AddDoctorModal: React.FC<AddDoctorModalProps> = ({
   const [name, setName] = useState("");
   const [specialty, setSpecialty] = useState("");
   const [imagePreview, setImagePreview] = useState("");
-
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
 
     if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      return;
+    }
+
+    setImageFile(file);
 
     const reader = new FileReader();
 
@@ -38,14 +44,13 @@ const AddDoctorModal: React.FC<AddDoctorModalProps> = ({
 
     reader.readAsDataURL(file);
   };
-
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (isSaving || !name.trim() || !specialty.trim()) return;
     onSave({
       name: name.trim(),
-      specialty,
-      image: imagePreview || undefined,
+      specialty: specialty.trim(),
+      image: imageFile ?? undefined,
     });
   };
 

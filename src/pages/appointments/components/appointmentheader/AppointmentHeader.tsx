@@ -1,8 +1,21 @@
 import React from "react";
-import { CalendarDays, ChevronDown, Search } from "lucide-react";
+import { CalendarDays, ChevronDown } from "lucide-react";
 import classes from "./AppointmentHeader.module.css";
-
-const AppointmentHeader: React.FC = () => {
+import type { AppointmentStatus } from "../../../../domain/appointment";
+import { DatePicker } from "antd";
+import dayjs, { type Dayjs } from "dayjs";
+type AppointmentHeaderProps = {
+  status: AppointmentStatus | "";
+  selectedDate: Dayjs | null;
+  onStatusChange: (status: AppointmentStatus | "") => void;
+  onDateChange: (date: Dayjs | null) => void;
+};
+const AppointmentHeader: React.FC<AppointmentHeaderProps> = ({
+  status,
+  selectedDate,
+  onStatusChange,
+  onDateChange,
+}) => {
   return (
     <>
       <header className={classes.header}>
@@ -13,23 +26,27 @@ const AppointmentHeader: React.FC = () => {
       </header>
 
       <div className={classes.filters}>
-        <button type="button">
-          <CalendarDays size={17} />
-          Today, Oct 24
-          <ChevronDown size={15} />
-        </button>
+        <DatePicker
+          value={selectedDate}
+          onChange={onDateChange}
+          minDate={dayjs().startOf("day")}
+          format="ddd, MMM D"
+          allowClear={true}
+          suffixIcon={<CalendarDays size={17} />}
+        />
 
         <button type="button">
+          {status || "All Status"}
+          <ChevronDown size={15} />
+        </button>
+        <button type="button" onClick={() => onStatusChange("")}>
           All Status
-          <ChevronDown size={15} />
         </button>
-
-        <button type="button">Confirmed</button>
-        <button type="button">Waiting</button>
-
-        <button type="button">
-          <Search size={17} />
-          All
+        <button type="button" onClick={() => onStatusChange("In Progress")}>
+          In Progress
+        </button>
+        <button type="button" onClick={() => onStatusChange("Waiting")}>
+          Waiting
         </button>
       </div>
     </>
