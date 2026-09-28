@@ -1,4 +1,4 @@
-import type { GetPatientsResponse, Patient } from "../domain/patient";
+import type { CreatePatientInput, GetPatientsResponse, Patient } from "../domain/patient";
 import { supabase } from "../lib/connect";
 
 export const getPatients = async ({
@@ -82,4 +82,26 @@ export const getPatientByCode = async (
   if (error) throw error;
 
   return data as Patient | null;
+};
+
+export const createPatient = async (
+  patient: CreatePatientInput,
+): Promise<Patient> => {
+  const { data, error } = await supabase
+    .from("patients")
+    .insert({
+      full_name: patient.full_name.trim(),
+      phone: patient.phone.trim(),
+      email: patient.email?.trim() || null,
+      date_of_birth: patient.date_of_birth,
+      gender: patient.gender,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data as Patient;
 };

@@ -1,29 +1,32 @@
 import React from "react";
 import { BriefcaseMedical, Plus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import classes from "./DoctorStatus.module.css";
-
-const doctors = [
-  {
-    name: "Dr. Smith",
-    state: "Available",
-    color: "green",
-    image: "https://i.pravatar.cc/150?img=12",
-  },
-  {
-    name: "Dr. Lee",
-    state: "In Consult",
-    color: "red",
-    image: "https://i.pravatar.cc/150?img=47",
-  },
-  {
-    name: "Dr. Jones",
-    state: "Off Duty",
-    color: "gray",
-    initials: "AJ",
-  },
-];
+import type { Doctor } from "../../../../domain/doctor";
+import { getDashboardDoctors } from "../../../../services/dashboard";
 
 const DoctorStatus: React.FC = () => {
+  const navigate = useNavigate();
+
+  const {
+    data: doctors = [],
+    isLoading,
+    isError,
+  } = useQuery<Doctor[]>({
+    queryKey: ["dashboard-doctors"],
+    queryFn: getDashboardDoctors,
+    staleTime: 60 * 1000,
+  });
+
+  if (isLoading) {
+    return <section className={classes.card}>Loading doctors...</section>;
+  }
+
+  if (isError) {
+    return <section className={classes.card}>Could not load doctors.</section>;
+  }
+
   return (
     <section className={classes.card}>
       <div className={classes.header}>
@@ -34,35 +37,46 @@ const DoctorStatus: React.FC = () => {
       </div>
 
       <div className={classes.grid}>
-        {doctors.map((doctor) => (
-          <article className={classes.doctor} key={doctor.name}>
-            <div className={classes.avatarWrapper}>
-              {doctor.image ? (
-                <img
-                  className={classes.avatarImage}
-                  src={doctor.image}
-                  alt={doctor.name}
-                />
-              ) : (
-                <span className={classes.avatarInitials}>
-                  {doctor.initials}
-                </span>
-              )}
+        {doctors.map((doctor) => {
+          const initials = doctor.name
+            .replace("Dr. ", "")
+            .split(" ")
+            .map((part) => part[0])
+            .join("")
+            .slice(0, 2);
 
-              <span
-                className={`${classes.statusDot} ${classes[doctor.color]}`}
-              />
-            </div>
+          const color = doctor.status === "Active" ? "green" : "gray";
 
-            <strong>{doctor.name}</strong>
+          return (
+            <article className={classes.doctor} key={doctor.id}>
+              <div className={classes.avatarWrapper}>
+                {doctor.image ? (
+                  <img
+                    className={classes.avatarImage}
+                    src={doctor.image}
+                    alt={doctor.name}
+                  />
+                ) : (
+                  <span className={classes.avatarInitials}>{initials}</span>
+                )}
 
-            <span className={`${classes.badge} ${classes[doctor.color]}`}>
-              {doctor.state}
-            </span>
-          </article>
-        ))}
+                <span className={`${classes.statusDot} ${classes[color]}`} />
+              </div>
 
-        <button type="button" className={classes.viewAll}>
+              <strong>{doctor.name}</strong>
+
+              <span className={`${classes.badge} ${classes[color]}`}>
+                {doctor.status}
+              </span>
+            </article>
+          );
+        })}
+
+        <button
+          type="button"
+          className={classes.viewAll}
+          onClick={() => navigate("/doctors")}
+        >
           <Plus size={30} strokeWidth={2} />
           <span>View All</span>
         </button>

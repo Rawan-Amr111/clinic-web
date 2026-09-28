@@ -11,7 +11,15 @@ export type Patient = {
   created_at: string;
 };
 
- export type GetPatientsResponse = {
+export type CreatePatientInput = {
+  full_name: string;
+  phone: string;
+  email?: string;
+  date_of_birth: string;
+  gender: "Female" | "Male";
+};
+
+export type GetPatientsResponse = {
   patients: Patient[];
   total: number;
 };

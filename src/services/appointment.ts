@@ -1,7 +1,14 @@
 import type {
   Appointment,
+  AppointmentDisplayStatus,
   AppointmentRow,
   AppointmentStatus,
+  CreateAppointmentInput,
+  GetPatientVisitHistoryParams,
+  PatientRecentVisit,
+  PatientVisitHistoryItem,
+  PatientVisitHistoryRow,
+  RecentVisitRow,
 } from "../domain/appointment";
 import { supabase } from "../lib/connect";
 
@@ -42,14 +49,6 @@ export const getAppointments = async ({
     `,
     )
     .gte("appointment_at", startDate.toISOString());
-
-  /*
-    بدون تاريخ محدد:
-    من اليوم وما بعده.
-
-    مع تاريخ محدد:
-    مواعيد اليوم المحدد فقط.
-  */
   if (date) {
     query = query.lt("appointment_at", nextDate.toISOString());
   }
@@ -93,12 +92,208 @@ export const getAppointments = async ({
       doctor: doctor.name,
       department: doctor.specialty,
       status: appointment.status,
+      displayStatus: getDisplayStatus(
+        appointment.status,
+        appointment.appointment_at,
+      ),
       phone: patient.phone,
       dob: new Date(patient.date_of_birth).toLocaleDateString("en-US", {
         month: "short",
         day: "2-digit",
         year: "numeric",
       }),
+    };
+  });
+};
+
+export const createAppointment = async ({
+  patient_id,
+  doctor_id,
+  appointment_at,
+  duration_minutes,
+  reason,
+}: CreateAppointmentInput): Promise<void> => {
+  const { error } = await supabase.from("appointments").insert({
+    patient_id,
+    doctor_id,
+    appointment_at,
+    duration_minutes,
+    reason,
+  });
+
+  if (error) {
+    throw error;
+  }
+};
+
+export const getDisplayStatus = (
+  status: AppointmentStatus,
+  appointmentAt: string,
+): AppointmentDisplayStatus => {
+  const appointmentDate = new Date(appointmentAt);
+  appointmentDate.setHours(0, 0, 0, 0);
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  if (status === "Waiting" && appointmentDate > today) {
+    return "Upcoming";
+  }
+
+  return status;
+};
+
+export const getRecentVisits = async (
+  patientId: string,
+): Promise<PatientRecentVisit[]> => {
+  const { data, error } = await supabase
+    .from("appointments")
+    .select(
+      `
+      id,
+      appointment_at,
+      reason,
+      status,
+      doctors (
+        name,
+        specialty
+      )
+    `,
+    )
+    .eq("patient_id", patientId)
+    .eq("status", "Completed")
+    .order("appointment_at", { ascending: false })
+    .limit(3);
+
+  if (error) {
+    throw error;
+  }
+
+  const visits = (data ?? []) as unknown as RecentVisitRow[];
+
+  return visits.map((visit) => {
+    if (!visit.doctors) {
+      throw new Error("Visit is missing its doctor.");
+    }
+
+    return {
+      id: visit.id,
+      appointment_at: visit.appointment_at,
+      reason: visit.reason,
+      status: visit.status,
+      doctor_name: visit.doctors.name,
+      specialty: visit.doctors.specialty,
+    };
+  });
+};
+export const getFullVisits = async (
+  patientId: string,
+): Promise<PatientRecentVisit[]> => {
+  const { data, error } = await supabase
+    .from("appointments")
+    .select(
+      `
+      id,
+      appointment_at,
+      reason,
+      status,
+      doctors (
+        name,
+        specialty
+      )
+    `,
+    )
+    .eq("patient_id", patientId)
+    .eq("status", "Completed")
+    .order("appointment_at", { ascending: false });
+
+  if (error) {
+    throw error;
+  }
+
+  const visits = (data ?? []) as unknown as RecentVisitRow[];
+
+  return visits.map((visit) => {
+    if (!visit.doctors) {
+      throw new Error("Visit is missing its doctor.");
+    }
+
+    return {
+      id: visit.id,
+      appointment_at: visit.appointment_at,
+      reason: visit.reason,
+      status: visit.status,
+      doctor_name: visit.doctors.name,
+      specialty: visit.doctors.specialty,
+    };
+  });
+};
+
+export const getPatientVisitHistory = async ({
+  patientId,
+  doctorId,
+  status,
+}: GetPatientVisitHistoryParams): Promise<PatientVisitHistoryItem[]> => {
+  let query = supabase
+    .from("appointments")
+    .select(
+      `
+      id,
+      appointment_at,
+      reason,
+      status,
+      doctor_id,
+      doctors (
+        name,
+        specialty
+      )
+    `,
+    )
+    .eq("patient_id", patientId);
+
+  const tomorrow = new Date();
+  tomorrow.setHours(24, 0, 0, 0);
+
+  if (doctorId) {
+    query = query.eq("doctor_id", doctorId);
+  }
+
+  if (status === "Upcoming") {
+    query = query
+      .eq("status", "Waiting")
+      .gte("appointment_at", tomorrow.toISOString());
+  } else if (status === "Waiting") {
+    query = query
+      .eq("status", "Waiting")
+      .lt("appointment_at", tomorrow.toISOString());
+  } else if (status) {
+    query = query.eq("status", status);
+  }
+
+  const { data, error } = await query.order("appointment_at", {
+    ascending: false,
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  const visits = (data ?? []) as unknown as PatientVisitHistoryRow[];
+
+  return visits.map((visit) => {
+    if (!visit.doctors) {
+      throw new Error("Appointment is missing its doctor.");
+    }
+
+    return {
+      id: visit.id,
+      appointment_at: visit.appointment_at,
+      reason: visit.reason,
+      status: visit.status,
+      displayStatus: getDisplayStatus(visit.status, visit.appointment_at),
+      doctor_id: visit.doctor_id,
+      doctor_name: visit.doctors.name,
+      specialty: visit.doctors.specialty,
     };
   });
 };

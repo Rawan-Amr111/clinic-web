@@ -64,7 +64,11 @@ function PatientHistory() {
         </div>
 
         <div className={classes.tabContent}>
-          {activeTab === "visits" ? <RecentVisits /> : <SharedRecords />}
+          {activeTab === "visits" ? (
+            <RecentVisits patientId={patient.id} />
+          ) : (
+            <SharedRecords />
+          )}
         </div>
       </section>
     </main>

@@ -111,6 +111,12 @@
   color: #bf2600;
 }
 
+.upcoming {
+  color: #1d4ed8;
+  background: #dbeafe;
+  border: 1px solid #bfdbfe;
+}
+
 .arrow {
   display: grid;
   width: 28px;

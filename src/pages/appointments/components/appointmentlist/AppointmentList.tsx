@@ -9,7 +9,8 @@ type AppointmentListProps = {
   onSelect: (appointment: Appointment) => void;
 };
 
-const getStatusClass = (status: Appointment["status"]) => {
+const getStatusClass = (status: Appointment["displayStatus"]) => {
+  if (status === "Upcoming") return classes.upcoming;
   if (status === "In Progress") return classes.inProgress;
   if (status === "Completed") return classes.completed;
   if (status === "Cancelled") return classes.cancelled;
@@ -63,10 +64,10 @@ const AppointmentList: React.FC<AppointmentListProps> = ({
 
             <span
               className={`${classes.status} ${getStatusClass(
-                appointment.status,
+                appointment.displayStatus,
               )}`}
             >
-              {appointment.status}
+              {appointment.displayStatus}
             </span>
 
             <span className={classes.arrow}>›</span>
