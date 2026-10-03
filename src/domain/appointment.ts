@@ -53,6 +53,7 @@ export type CreateAppointmentInput = {
   doctor_id: string;
   appointment_at: string;
   duration_minutes: number;
+  addToQueue: boolean;
   reason: string;
 };
 

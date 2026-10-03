@@ -134,8 +134,6 @@ export const uploadDoctorAvatar = async (file: File): Promise<string> => {
   return data.publicUrl;
 };
 
-// doctors.ts
-
 export const getActiveDoctors = async (): Promise<Doctor[]> => {
   const { data, error } = await supabase
     .from("doctors")

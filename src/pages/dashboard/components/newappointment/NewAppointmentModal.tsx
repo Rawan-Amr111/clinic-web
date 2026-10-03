@@ -66,6 +66,10 @@ const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
         queryKey: ["appointments"],
       });
 
+      queryClient.invalidateQueries({
+        queryKey: ["live-queue"],
+      });
+
       onClose();
     },
   });
@@ -103,14 +107,12 @@ const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
       appointment_at: appointmentAt,
       duration_minutes: durationMinutes,
       reason,
+      addToQueue,
     });
-
-    
   };
 
   return (
     <>
-      {" "}
       <div className={classes.overlay} onMouseDown={onClose}>
         <form
           className={classes.modal}

@@ -1,43 +1,31 @@
 import React from "react";
 import { ClipboardList } from "lucide-react";
 import classes from "./liveQueue.module.css";
-
-const queue = [
-  {
-    number: "01",
-    name: "Sarah Jenkins",
-    details: "General Checkup • Dr. Smith",
-    status: "In Progress",
-    time: "10:30 AM",
-    note: "-",
-  },
-  {
-    number: "02",
-    name: "Michael Chang",
-    details: "Consultation • Dr. Lee",
-    status: "Waiting",
-    time: "10:45 AM",
-    note: "5m wait",
-  },
-  {
-    number: "03",
-    name: "Emily Roberts",
-    details: "Blood Test • Lab",
-    status: "Waiting",
-    time: "11:00 AM",
-    note: "On time",
-  },
-  {
-    number: "04",
-    name: "David O'Connor",
-    details: "Follow-up • Dr. Smith",
-    status: "Checked In",
-    time: "11:15 AM",
-    note: "-",
-  },
-];
+import { getLiveQueue } from "../../../../services/liveQueue";
+import { useQuery } from "@tanstack/react-query";
+import type { LiveQueue } from "../../../../domain/liveQueue";
+import { useNavigate } from "react-router-dom";
 
 const LiveQueue: React.FC = () => {
+  const navigate = useNavigate();
+  const {
+    data: queue = [],
+    isLoading,
+    isError,
+  } = useQuery<LiveQueue[]>({
+    queryKey: ["live-queue"],
+    queryFn: () => getLiveQueue({ limit: 5 }),
+    staleTime: 60 * 1000,
+  });
+
+  if (isLoading) {
+    return <p>Loading live queue...</p>;
+  }
+
+  if (isError) {
+    return <p>Error loading live queue. Please try again later.</p>;
+  }
+
   return (
     <section className={classes.card}>
       <div className={classes.header}>
@@ -46,39 +34,54 @@ const LiveQueue: React.FC = () => {
           <h2>Live Queue</h2>
         </div>
 
-        <button type="button" className={classes.viewAll}>
+        <button
+          type="button"
+          className={classes.viewAll}
+          onClick={() => navigate("/live-queue")}
+        >
           View All
         </button>
       </div>
 
       <div className={classes.queue}>
-        {queue.map((patient) => (
-          <div className={classes.queueItem} key={patient.number}>
-            <span className={classes.number}>{patient.number}</span>
+        {queue.map((patient) => {
+          const appointmentTime = new Date(
+            patient.appointment_at,
+          ).toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
 
-            <div className={classes.patientInfo}>
-              <h3>{patient.name}</h3>
-              <p>{patient.details}</p>
+          return (
+            <div className={classes.queueItem} key={patient.id}>
+              <span className={classes.number}>#{patient.queue_number}</span>
+
+              <div className={classes.patientInfo}>
+                <h3>{patient.patient_name}</h3>
+                <p>
+                  {patient.doctor_name} · {patient.specialty}
+                </p>
+              </div>
+
+              <span
+                className={`${classes.status} ${
+                  patient.status === "In Consultation"
+                    ? classes.inProgress
+                    : patient.status === "Waiting"
+                      ? classes.waiting
+                      : classes.checkedIn
+                }`}
+              >
+                {patient.status}
+              </span>
+
+              <div className={classes.time}>
+                <strong>{appointmentTime}</strong>
+                <span>{patient.patient_code}</span>
+              </div>
             </div>
-
-            <span
-              className={`${classes.status} ${
-                patient.status === "In Progress"
-                  ? classes.inProgress
-                  : patient.status === "Waiting"
-                    ? classes.waiting
-                    : classes.checkedIn
-              }`}
-            >
-              {patient.status}
-            </span>
-
-            <div className={classes.time}>
-              <strong>{patient.time}</strong>
-              <span>{patient.note}</span>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

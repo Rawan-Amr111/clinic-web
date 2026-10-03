@@ -112,20 +112,23 @@ export const createAppointment = async ({
   appointment_at,
   duration_minutes,
   reason,
-}: CreateAppointmentInput): Promise<void> => {
-  const { error } = await supabase.from("appointments").insert({
-    patient_id,
-    doctor_id,
-    appointment_at,
-    duration_minutes,
-    reason,
+  addToQueue,
+}: CreateAppointmentInput): Promise<string> => {
+  const { data, error } = await supabase.rpc("create_appointment_with_queue", {
+    p_patient_id: patient_id,
+    p_doctor_id: doctor_id,
+    p_appointment_at: appointment_at,
+    p_duration_minutes: duration_minutes,
+    p_reason: reason,
+    p_add_to_queue: addToQueue,
   });
 
   if (error) {
     throw error;
   }
-};
 
+  return data as string;
+};
 export const getDisplayStatus = (
   status: AppointmentStatus,
   appointmentAt: string,
