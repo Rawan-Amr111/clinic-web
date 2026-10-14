@@ -1,35 +1,27 @@
 import React from "react";
 import { Clock3 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import { getAppointments } from "../../../../services/appointment";
+import type { Appointment } from "../../../../domain/appointment";
 import classes from "./TodaySchedule.module.css";
 
-const schedule = [
-  {
-    time: "09:00 AM",
-    title: "Morning Briefing",
-    subtitle: "All Staff",
-    color: "neutral",
-  },
-  {
-    time: "10:30 AM",
-    title: "Peak Patient Flow",
-    subtitle: "Expected 15 patients",
-    color: "blue",
-  },
-  {
-    time: "12:00 PM",
-    title: "Lunch Break Shift 1",
-    subtitle: "",
-    color: "neutral",
-  },
-  {
-    time: "02:00 PM",
-    title: "Specialist",
-    subtitle: "",
-    color: "neutral",
-  },
-];
-
 const TodaySchedule: React.FC = () => {
+  const navigate = useNavigate();
+  const today = new Date().toLocaleDateString("en-CA");
+  const { data: appointments = [], isLoading, isError } = useQuery<Appointment[]>({
+    queryKey: ["appointments", today, "", false],
+    queryFn: () => getAppointments({ date: today, status: "" }),
+    staleTime: 60 * 1000,
+  });
+  const currentAppointment = appointments.find(
+    (appointment) => appointment.status === "In Progress",
+  );
+  const nextAppointment = appointments.find(
+    (appointment) => new Date(appointment.appointmentAt).getTime() >= Date.now(),
+  );
+  const highlightedId = currentAppointment?.id ?? nextAppointment?.id;
+
   return (
     <section className={classes.card}>
       <div className={classes.header}>
@@ -40,27 +32,42 @@ const TodaySchedule: React.FC = () => {
       </div>
 
       <div className={classes.timeline}>
-        {schedule.map((item) => (
-          <div className={classes.scheduleItem} key={item.time}>
-            <time>{item.time}</time>
+        {isLoading ? (
+          <p>Loading today&apos;s appointments...</p>
+        ) : isError ? (
+          <p>Could not load today&apos;s schedule.</p>
+        ) : appointments.length === 0 ? (
+          <p>No appointments scheduled for today.</p>
+        ) : (
+          appointments.slice(0, 5).map((appointment) => {
+            const isHighlighted = appointment.id === highlightedId;
+            const time = new Date(appointment.appointmentAt).toLocaleTimeString("en-US", {
+              hour: "2-digit",
+              minute: "2-digit",
+            });
 
-            <span
-              className={`${classes.dot} ${
-                item.color === "blue" ? classes.activeDot : ""
-              }`}
-            />
+            return (
+              <div className={classes.scheduleItem} key={appointment.id}>
+                <time className={isHighlighted ? classes.activeTime : ""}>{time}</time>
 
-            <div
-              className={`${classes.event} ${
-                item.color === "blue" ? classes.blueEvent : ""
-              }`}
-            >
-              <strong>{item.title}</strong>
-              {item.subtitle && <span>{item.subtitle}</span>}
-            </div>
-          </div>
-        ))}
+                <span className={`${classes.dot} ${isHighlighted ? classes.activeDot : ""}`} />
+
+                <div className={`${classes.event} ${isHighlighted ? classes.blueEvent : ""}`}>
+                  <strong>{appointment.patient}</strong>
+                  <span>
+                    {appointment.doctor} · {appointment.department} · {appointment.displayStatus}
+                  </span>
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
+      {!isLoading && !isError && appointments.length > 5 && (
+        <button type="button" className={classes.viewAll} onClick={() => navigate("/appointments")}>
+          View all {appointments.length} appointments
+        </button>
+      )}
     </section>
   );
 };

@@ -6,12 +6,20 @@ import classes from "./DoctorsGrid.module.css";
 type DoctorsGridProps = {
   doctors: Doctor[];
   isUpdatingStatus: boolean;
+  appointmentCounts: Record<string, number>;
+  isLoadingAppointments: boolean;
+  hasAppointmentCountError: boolean;
   onToggleStatus: (doctorId: string, currentStatus: DoctorStatus) => void;
+  onViewSchedule: (doctor: Doctor) => void;
 };
 const DoctorsGrid: React.FC<DoctorsGridProps> = ({
   doctors,
   isUpdatingStatus,
+  appointmentCounts,
+  isLoadingAppointments,
+  hasAppointmentCountError,
   onToggleStatus,
+  onViewSchedule,
 }) => {
   return (
     <section className={classes.grid}>
@@ -72,10 +80,20 @@ const DoctorsGrid: React.FC<DoctorsGridProps> = ({
             <div className={classes.appointments}>
               <CalendarDays size={15} />
               <span>Today's Appts</span>
-              <strong>0</strong>
+              <strong>
+                {isLoadingAppointments
+                  ? "…"
+                  : hasAppointmentCountError
+                    ? "—"
+                    : appointmentCounts[doctor.id] ?? 0}
+              </strong>
             </div>
 
-            <button type="button" className={classes.scheduleButton}>
+            <button
+              type="button"
+              className={classes.scheduleButton}
+              onClick={() => onViewSchedule(doctor)}
+            >
               <CalendarDays size={15} />
               View Schedule
             </button>

@@ -30,6 +30,17 @@
   position: relative;
 }
 
+.viewAll {
+  margin: 0.5rem 0 0 6.5rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #0057d8;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 .timeline::before {
   position: absolute;
   top: 1rem;
@@ -61,7 +72,7 @@
   white-space: nowrap;
 }
 
-.scheduleItem:nth-child(2) time {
+.activeTime {
   color: #0057d8;
 }
 

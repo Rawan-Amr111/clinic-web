@@ -199,9 +199,57 @@
   cursor: pointer;
 }
 
+.editForm {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid #d8e1ed;
+  border-radius: 8px;
+}
+
+.editForm label {
+  display: grid;
+  gap: 0.3rem;
+  color: #475569;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.editForm input,
+.editForm textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.55rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  color: #172033;
+  font: inherit;
+}
+
+.editForm button {
+  min-height: 38px;
+  border: 0;
+  border-radius: 6px;
+  background: #075fd5;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.editForm button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
 .footer {
   padding: 1rem 1.25rem;
   border-top: 1px solid #e2e8f0;
+}
+
+.footerActions {
+  display: grid;
+  gap: 0.55rem;
 }
 
 .footer button {
@@ -218,6 +266,21 @@
   font-size: 0.84rem;
   font-weight: 700;
   cursor: pointer;
+}
+
+.footer .cancelButton {
+  border: 1px solid #fecaca;
+  background: #fff;
+  color: #b42318;
+}
+
+.footer .cancelButton:hover {
+  background: #fef2f2;
+}
+
+.footer button:disabled {
+  cursor: wait;
+  opacity: 0.65;
 }
 
 @media (max-width: 850px) {

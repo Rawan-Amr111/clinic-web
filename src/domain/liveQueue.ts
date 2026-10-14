@@ -1,7 +1,7 @@
 export type LiveQueue = {
   id: string;
   queue_number: number;
-  status: "Waiting" | "In Consultation" | "On Hold";
+  status: "Waiting" | "In Consultation" | "On Hold" | "Completed" | "Cancelled";
   appointment_at: string;
 
   patient_name: string;
@@ -29,6 +29,7 @@ export type LiveQueueRow = {
   } | null;
 
   appointments: {
+    id: string;
     appointment_at: string;
   } | null;
 };

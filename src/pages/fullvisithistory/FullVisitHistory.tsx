@@ -8,93 +8,60 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import { Button, Empty, Input, Select, Tag } from "antd";
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
+import type { PatientRecentVisit } from "../../domain/appointment";
+import { getFullVisits } from "../../services/appointment";
+import { getPatientById } from "../../services/patients";
 import classes from "./FullVisitHistory.module.css";
 
-type VisitStatus = "Completed" | "Cancelled" | "Upcoming";
-
-type Visit = {
-  id: string;
-  title: string;
-  doctor: string;
-  specialty: string;
-  date: string;
-  time: string;
-  status: VisitStatus;
-};
-
-const visits: Visit[] = [
-  {
-    id: "visit-001",
-    title: "Annual Checkup",
-    doctor: "Dr. Robert Chen",
-    specialty: "General Medicine",
-    date: "Oct 24, 2023",
-    time: "10:30 AM",
-    status: "Completed",
-  },
-  {
-    id: "visit-002",
-    title: "Dermatology Consult",
-    doctor: "Dr. Amanda Torres",
-    specialty: "Dermatology",
-    date: "Mar 12, 2023",
-    time: "01:00 PM",
-    status: "Completed",
-  },
-  {
-    id: "visit-003",
-    title: "Follow-up Consultation",
-    doctor: "Dr. Sarah Wilson",
-    specialty: "General Medicine",
-    date: "Jan 08, 2023",
-    time: "11:15 AM",
-    status: "Completed",
-  },
-  {
-    id: "visit-004",
-    title: "Cardiology Consultation",
-    doctor: "Dr. Michael Brown",
-    specialty: "Cardiology",
-    date: "Dec 14, 2022",
-    time: "09:00 AM",
-    status: "Cancelled",
-  },
-  {
-    id: "visit-005",
-    title: "Routine Blood Test",
-    doctor: "Dr. Robert Chen",
-    specialty: "Laboratory",
-    date: "Nov 05, 2022",
-    time: "12:00 PM",
-    status: "Completed",
-  },
-];
+type VisitStatus = "Completed" | "Cancelled";
 
 function FullVisitHistory() {
   const navigate = useNavigate();
   const { patientId } = useParams<{ patientId: string }>();
-
   const [search, setSearch] = useState("");
   const [doctor, setDoctor] = useState<string>();
   const [status, setStatus] = useState<VisitStatus>();
 
+  const {
+    data: visits = [],
+    isLoading,
+    isError,
+  } = useQuery<PatientRecentVisit[]>({
+    queryKey: ["patient-visits", patientId],
+    queryFn: () => getFullVisits(patientId!),
+    enabled: Boolean(patientId),
+    staleTime: 60 * 1000,
+  });
+  const { data: patient } = useQuery({
+    queryKey: ["patient", patientId],
+    queryFn: () => getPatientById(patientId!),
+    enabled: Boolean(patientId),
+    staleTime: 60 * 1000,
+  });
+
+  const doctors = useMemo(
+    () => [...new Set(visits.map((visit) => visit.doctor_name))],
+    [visits],
+  );
   const filteredVisits = useMemo(() => {
     const query = search.trim().toLowerCase();
 
     return visits.filter((visit) => {
       const matchesSearch =
         !query ||
-        visit.title.toLowerCase().includes(query) ||
-        visit.doctor.toLowerCase().includes(query) ||
+        (visit.reason ?? "Consultation").toLowerCase().includes(query) ||
+        visit.doctor_name.toLowerCase().includes(query) ||
         visit.specialty.toLowerCase().includes(query);
 
-      const matchesDoctor = !doctor || visit.doctor === doctor;
-      const matchesStatus = !status || visit.status === status;
-
-      return matchesSearch && matchesDoctor && matchesStatus;
+      return (
+        matchesSearch &&
+        (!doctor || visit.doctor_name === doctor) &&
+        (!status || visit.status === status)
+      );
     });
-  }, [doctor, search, status]);
+  }, [doctor, search, status, visits]);
 
   const resetFilters = () => {
     setSearch("");
@@ -102,12 +69,8 @@ function FullVisitHistory() {
     setStatus(undefined);
   };
 
-  const getStatusClass = (visitStatus: VisitStatus) => {
-    if (visitStatus === "Completed") return classes.completed;
-    if (visitStatus === "Cancelled") return classes.cancelled;
-
-    return classes.upcoming;
-  };
+  const getStatusClass = (visitStatus: VisitStatus) =>
+    visitStatus === "Completed" ? classes.completed : classes.cancelled;
 
   return (
     <main className={classes.page}>
@@ -124,12 +87,12 @@ function FullVisitHistory() {
         <div>
           <span className={classes.eyebrow}>PATIENT ACTIVITY</span>
           <h1>Full Visit History</h1>
-          <p>All appointments and visit statuses for Sarah Jenkins.</p>
+          <p>Completed and cancelled appointments for {patient?.full_name ?? "this patient"}.</p>
         </div>
 
         <div className={classes.totalVisits}>
           <strong>{visits.length}</strong>
-          <span>Total Appointments</span>
+          <span>Total Visits</span>
         </div>
       </header>
 
@@ -150,14 +113,8 @@ function FullVisitHistory() {
             onChange={setDoctor}
             placeholder="All Doctors"
             className={classes.select}
-            options={[
-              { value: "Dr. Robert Chen", label: "Dr. Robert Chen" },
-              { value: "Dr. Amanda Torres", label: "Dr. Amanda Torres" },
-              { value: "Dr. Sarah Wilson", label: "Dr. Sarah Wilson" },
-              { value: "Dr. Michael Brown", label: "Dr. Michael Brown" },
-            ]}
+            options={doctors.map((name) => ({ value: name, label: name }))}
           />
-
           <Select<VisitStatus>
             allowClear
             value={status}
@@ -167,10 +124,8 @@ function FullVisitHistory() {
             options={[
               { value: "Completed", label: "Completed" },
               { value: "Cancelled", label: "Cancelled" },
-              { value: "Upcoming", label: "Upcoming" },
             ]}
           />
-
           <Button onClick={resetFilters}>Clear Filters</Button>
         </div>
       </section>
@@ -184,9 +139,23 @@ function FullVisitHistory() {
       </div>
 
       <section className={classes.visitsList}>
-        {filteredVisits.length ? (
+        {isLoading ? (
+          <p>Loading visit history...</p>
+        ) : isError ? (
+          <p>Could not load visit history. Please try again.</p>
+        ) : filteredVisits.length ? (
           filteredVisits.map((visit) => {
-            const [month, dayWithComma, year] = visit.date.split(" ");
+            const visitDate = new Date(visit.appointment_at);
+            const date = visitDate.toLocaleDateString("en-US", {
+              month: "short",
+              day: "2-digit",
+              year: "numeric",
+            });
+            const [month, dayWithComma, year] = date.split(" ");
+            const time = visitDate.toLocaleTimeString("en-US", {
+              hour: "2-digit",
+              minute: "2-digit",
+            });
 
             return (
               <article className={classes.visitCard} key={visit.id}>
@@ -195,40 +164,25 @@ function FullVisitHistory() {
                   <strong>{dayWithComma.replace(",", "")}</strong>
                   <small>{year}</small>
                 </div>
-
                 <div className={classes.visitInfo}>
                   <div className={classes.cardTop}>
                     <Tag
                       className={`${classes.status} ${getStatusClass(
-                        visit.status,
+                        visit.status === "Completed" ? "Completed" : "Cancelled",
                       )}`}
                     >
                       {visit.status}
                     </Tag>
-
                     <span className={classes.time}>
                       <ClockCircleOutlined />
-                      {visit.time}
+                      {time}
                     </span>
                   </div>
-
-                  <h3>{visit.title}</h3>
-
+                  <h3>{visit.reason ?? "Consultation"}</h3>
                   <div className={classes.meta}>
-                    <span>
-                      <MedicineBoxOutlined />
-                      {visit.specialty}
-                    </span>
-
-                    <span>
-                      <UserOutlined />
-                      {visit.doctor}
-                    </span>
-
-                    <span>
-                      <CalendarOutlined />
-                      {visit.date}
-                    </span>
+                    <span><MedicineBoxOutlined />{visit.specialty}</span>
+                    <span><UserOutlined />{visit.doctor_name}</span>
+                    <span><CalendarOutlined />{date}</span>
                   </div>
                 </div>
               </article>
@@ -236,10 +190,8 @@ function FullVisitHistory() {
           })
         ) : (
           <div className={classes.emptyState}>
-            <Empty description="No appointments match your filters." />
-            <Button type="primary" onClick={resetFilters}>
-              Reset Filters
-            </Button>
+            <Empty description="No completed or cancelled appointments match your filters." />
+            <Button type="primary" onClick={resetFilters}>Reset Filters</Button>
           </div>
         )}
       </section>

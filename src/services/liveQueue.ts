@@ -1,4 +1,5 @@
 import type { LiveQueue, LiveQueueRow } from "../domain/liveQueue";
+import type { AppointmentStatus } from "../domain/appointment";
 import { supabase } from "../lib/connect";
 type GetLiveQueueParams = {
   doctorId?: string;
@@ -33,6 +34,7 @@ export const getLiveQueue = async (
         specialty
       ),
       appointments (
+        id,
         appointment_at
       )
     `,
@@ -90,4 +92,63 @@ export const getLiveQueue = async (
   });
 
   return liveQueue;
+};
+
+export const updateLiveQueueStatus = async (
+  queueEntryId: string,
+  status: "In Consultation" | "Completed" | "Cancelled",
+): Promise<void> => {
+  const { data, error } = await supabase
+    .from("queue_entries")
+    .select("status, appointments(id,status)")
+    .eq("id", queueEntryId)
+    .single();
+
+  if (error) throw error;
+
+  const appointmentRelation = data?.appointments as unknown as
+    | { id: string; status: AppointmentStatus }
+    | { id: string; status: AppointmentStatus }[]
+    | null;
+  const appointment = Array.isArray(appointmentRelation)
+    ? appointmentRelation[0]
+    : appointmentRelation;
+  if (!appointment) {
+    throw new Error("Queue entry is missing its appointment.");
+  }
+
+  const appointmentStatus: AppointmentStatus =
+    status === "In Consultation" ? "In Progress" : status;
+
+  const { data: updatedAppointment, error: appointmentError } = await supabase
+    .from("appointments")
+    .update({ status: appointmentStatus })
+    .eq("id", appointment.id)
+    .select("id")
+    .maybeSingle();
+
+  if (appointmentError) throw appointmentError;
+  if (!updatedAppointment) {
+    throw new Error(
+      "The appointment was not updated. Check the database update policy and appointment link.",
+    );
+  }
+
+  const { data: updatedQueueEntry, error: queueError } = await supabase
+    .from("queue_entries")
+    .update({ status })
+    .eq("id", queueEntryId)
+    .select("id")
+    .maybeSingle();
+
+  if (queueError || !updatedQueueEntry) {
+    await supabase
+      .from("appointments")
+      .update({ status: appointment.status })
+      .eq("id", appointment.id);
+    if (queueError) throw queueError;
+    throw new Error(
+      "The queue entry was not updated. Check the database update policy.",
+    );
+  }
 };

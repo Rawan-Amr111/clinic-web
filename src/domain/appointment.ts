@@ -7,6 +7,7 @@ export type AppointmentStatus =
 export type AppointmentDisplayStatus = AppointmentStatus | "Upcoming";
 export type Appointment = {
   id: string;
+  appointmentAt: string;
   time: string;
   duration: string;
   patient: string;
@@ -15,6 +16,7 @@ export type Appointment = {
   doctor: string;
   department: string;
   status: AppointmentStatus;
+  reason: string | null;
   displayStatus: AppointmentDisplayStatus;
   phone: string | null;
   dob: string;
@@ -25,6 +27,7 @@ export type AppointmentRow = {
   appointment_at: string;
   duration_minutes: number;
   status: AppointmentStatus;
+  reason: string | null;
   patients: {
     full_name: string;
     patient_code: string;
@@ -53,7 +56,6 @@ export type CreateAppointmentInput = {
   doctor_id: string;
   appointment_at: string;
   duration_minutes: number;
-  addToQueue: boolean;
   reason: string;
 };
 

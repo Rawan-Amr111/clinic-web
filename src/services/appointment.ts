@@ -11,15 +11,20 @@ import type {
   RecentVisitRow,
 } from "../domain/appointment";
 import { supabase } from "../lib/connect";
+import { updateLiveQueueStatus } from "./liveQueue";
 
 type GetAppointmentsParams = {
   date: string | null;
   status: AppointmentStatus | "";
+  includeClosed?: boolean;
+  doctorId?: string | null;
 };
 
 export const getAppointments = async ({
   date,
   status,
+  includeClosed = false,
+  doctorId,
 }: GetAppointmentsParams): Promise<Appointment[]> => {
   const startDate = date ? new Date(`${date}T00:00:00`) : new Date();
 
@@ -36,6 +41,7 @@ export const getAppointments = async ({
       appointment_at,
       duration_minutes,
       status,
+      reason,
       patients (
         full_name,
         patient_code,
@@ -55,6 +61,11 @@ export const getAppointments = async ({
 
   if (status) {
     query = query.eq("status", status);
+  } else if (!includeClosed) {
+    query = query.not("status", "in", '("Completed","Cancelled")');
+  }
+  if (doctorId) {
+    query = query.eq("doctor_id", doctorId);
   }
 
   const { data, error } = await query.order("appointment_at", {
@@ -77,6 +88,7 @@ export const getAppointments = async ({
 
     return {
       id: appointment.id,
+      appointmentAt: appointment.appointment_at,
       time: new Date(appointment.appointment_at).toLocaleTimeString("en-US", {
         hour: "2-digit",
         minute: "2-digit",
@@ -92,6 +104,7 @@ export const getAppointments = async ({
       doctor: doctor.name,
       department: doctor.specialty,
       status: appointment.status,
+      reason: appointment.reason,
       displayStatus: getDisplayStatus(
         appointment.status,
         appointment.appointment_at,
@@ -112,7 +125,6 @@ export const createAppointment = async ({
   appointment_at,
   duration_minutes,
   reason,
-  addToQueue,
 }: CreateAppointmentInput): Promise<string> => {
   const { data, error } = await supabase.rpc("create_appointment_with_queue", {
     p_patient_id: patient_id,
@@ -120,7 +132,7 @@ export const createAppointment = async ({
     p_appointment_at: appointment_at,
     p_duration_minutes: duration_minutes,
     p_reason: reason,
-    p_add_to_queue: addToQueue,
+    p_add_to_queue: false,
   });
 
   if (error) {
@@ -128,6 +140,36 @@ export const createAppointment = async ({
   }
 
   return data as string;
+};
+
+export const updateAppointment = async (
+  appointmentId: string,
+  updates: { appointment_at?: string; reason?: string | null; status?: AppointmentStatus },
+): Promise<void> => {
+  if (updates.status === "Completed" || updates.status === "Cancelled") {
+    const { data: queueEntry, error: queueLookupError } = await supabase
+      .from("queue_entries")
+      .select("id, appointments!inner(id)")
+      .eq("appointments.id", appointmentId)
+      .maybeSingle();
+
+    if (queueLookupError) throw queueLookupError;
+
+    if (queueEntry) {
+      await updateLiveQueueStatus(queueEntry.id, updates.status);
+      return;
+    }
+  }
+
+  const { data, error } = await supabase
+    .from("appointments")
+    .update(updates)
+    .eq("id", appointmentId)
+    .select("id")
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!data) throw new Error("The appointment could not be updated.");
 };
 export const getDisplayStatus = (
   status: AppointmentStatus,
@@ -207,7 +249,7 @@ export const getFullVisits = async (
     `,
     )
     .eq("patient_id", patientId)
-    .eq("status", "Completed")
+    .in("status", ["Completed", "Cancelled"])
     .order("appointment_at", { ascending: false });
 
   if (error) {

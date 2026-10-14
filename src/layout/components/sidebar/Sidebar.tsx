@@ -4,7 +4,6 @@ import {
   ChartNoAxesColumn,
   ClipboardPlus,
   LayoutDashboard,
-  Settings,
   Stethoscope,
   UsersRound,
 } from "lucide-react";
@@ -18,7 +17,6 @@ const navItems = [
   { label: "Doctors", path: "/doctors", icon: Stethoscope },
   { label: "Patients", path: "/patients", icon: UsersRound },
   { label: "Analytics", path: "/analytics", icon: ChartNoAxesColumn },
-  { label: "Settings", path: "/settings", icon: Settings },
 ];
 
 export const Sidebar = () => {

@@ -3,7 +3,7 @@ import { ClipboardList } from "lucide-react";
 import classes from "./liveQueue.module.css";
 import { getLiveQueue } from "../../../../services/liveQueue";
 import { useQuery } from "@tanstack/react-query";
-import type { LiveQueue } from "../../../../domain/liveQueue";
+import type { LiveQueue as LiveQueueItem } from "../../../../domain/liveQueue";
 import { useNavigate } from "react-router-dom";
 
 const LiveQueue: React.FC = () => {
@@ -12,7 +12,7 @@ const LiveQueue: React.FC = () => {
     data: queue = [],
     isLoading,
     isError,
-  } = useQuery<LiveQueue[]>({
+  } = useQuery<LiveQueueItem[]>({
     queryKey: ["live-queue"],
     queryFn: () => getLiveQueue({ limit: 5 }),
     staleTime: 60 * 1000,

@@ -1,15 +1,60 @@
 import React from "react";
 import { Clock3, Hourglass } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { message, Select } from "antd";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import classes from "./QueueList.module.css";
 import type { LiveQueue } from "../../../../domain/liveQueue";
-import { getLiveQueue } from "../../../../services/liveQueue";
+import {
+  getLiveQueue,
+  updateLiveQueueStatus,
+} from "../../../../services/liveQueue";
 
 type QueueListProps = {
   doctorId?: string;
 };
 
 const QueueList: React.FC<QueueListProps> = ({ doctorId }) => {
+  const queryClient = useQueryClient();
+  const statusMutation = useMutation({
+    mutationFn: ({
+      queueEntryId,
+      status,
+    }: {
+      queueEntryId: string;
+      status: "In Consultation" | "Completed" | "Cancelled";
+    }) => updateLiveQueueStatus(queueEntryId, status),
+    onSuccess: (_data, variables) => {
+      message.success(`Appointment marked ${variables.status}.`);
+      queryClient.setQueriesData<LiveQueue[]>(
+        { queryKey: ["live-queue"] },
+        (currentQueue) => {
+          if (!currentQueue) return currentQueue;
+          if (
+            variables.status === "Completed" ||
+            variables.status === "Cancelled"
+          ) {
+            return currentQueue.filter(
+              (patient) => patient.id !== variables.queueEntryId,
+            );
+          }
+
+          return currentQueue.map((patient) =>
+            patient.id === variables.queueEntryId
+              ? { ...patient, status: variables.status }
+              : patient,
+          );
+        },
+      );
+      void Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["live-queue"] }),
+        queryClient.invalidateQueries({ queryKey: ["appointments"] }),
+        queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] }),
+        queryClient.invalidateQueries({ queryKey: ["patient-visits"] }),
+        queryClient.invalidateQueries({ queryKey: ["recent-visits"] }),
+      ]);
+    },
+    onError: (error: Error) => message.error(error.message),
+  });
   const {
     data: queue = [],
     isLoading,
@@ -46,6 +91,9 @@ const QueueList: React.FC<QueueListProps> = ({ doctorId }) => {
         const isCurrent = patient.status === "In Consultation";
         const isNext = doctorId ? patient.id === nextPatient?.id : false;
         const isHold = patient.status === "On Hold";
+        const isUpdating =
+          statusMutation.isPending &&
+          statusMutation.variables?.queueEntryId === patient.id;
 
         const appointmentTime = new Date(
           patient.appointment_at,
@@ -111,11 +159,27 @@ const QueueList: React.FC<QueueListProps> = ({ doctorId }) => {
                 </div>
               </div>
 
-              {isCurrent && (
-                <button className={classes.completeButton} type="button">
-                  Complete
-                </button>
-              )}
+              <div className={classes.queueActions}>
+                <Select
+                  aria-label={`Change status for ${patient.patient_name}`}
+                  className={classes.statusSelect}
+                  placeholder="Change status"
+                  value={isCurrent ? "In Consultation" : undefined}
+                  loading={isUpdating}
+                  disabled={isUpdating}
+                  onChange={(status: "In Consultation" | "Completed" | "Cancelled") =>
+                    statusMutation.mutate({
+                      queueEntryId: patient.id,
+                      status,
+                    })
+                  }
+                  options={[
+                    { value: "In Consultation", label: "In Consultation" },
+                    { value: "Completed", label: "Completed" },
+                    { value: "Cancelled", label: "Cancelled" },
+                  ]}
+                />
+              </div>
             </article>
           </React.Fragment>
         );

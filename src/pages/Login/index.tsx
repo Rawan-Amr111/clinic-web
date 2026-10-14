@@ -102,9 +102,9 @@ function Login() {
               label={
                 <div className={classes["password-label-container"]}>
                   <span>Password</span>
-                  <a href="#forgot" className={classes["forgot-password"]}>
+                  <span className={classes["forgot-password"]} aria-disabled="true">
                     Forgot password?
-                  </a>
+                  </span>
                 </div>
               }
               name="password"
@@ -132,7 +132,7 @@ function Login() {
           </Form>
 
           <div className={classes["footer-text"]}>
-            Having trouble? <a href="#support">Contact IT Support</a>
+            Having trouble? Contact your system administrator.
           </div>
         </div>
       </div>

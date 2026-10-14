@@ -7,7 +7,6 @@ import {
   Search,
   UserRoundPlus,
   X,
-  Zap,
 } from "lucide-react";
 import { Input } from "antd";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -27,7 +26,7 @@ const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
   onClose,
 }) => {
   const [reason, setReason] = useState("General");
-  const [addToQueue, setAddToQueue] = useState(true);
+  const [clinicalNotes, setClinicalNotes] = useState("");
 
   const [patientCodeInput, setPatientCodeInput] = useState("");
   const [searchedPatientCode, setSearchedPatientCode] = useState("");
@@ -69,6 +68,11 @@ const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
       queryClient.invalidateQueries({
         queryKey: ["live-queue"],
       });
+      queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
+      queryClient.invalidateQueries({ queryKey: ["doctor-appointment-counts"] });
+
+      queryClient.invalidateQueries({ queryKey: ["patient-visits"] });
+      queryClient.invalidateQueries({ queryKey: ["recent-visits"] });
 
       onClose();
     },
@@ -106,8 +110,9 @@ const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
       doctor_id: doctorId,
       appointment_at: appointmentAt,
       duration_minutes: durationMinutes,
-      reason,
-      addToQueue,
+      reason: clinicalNotes.trim()
+        ? `${reason}: ${clinicalNotes.trim()}`
+        : reason,
     });
   };
 
@@ -128,8 +133,7 @@ const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
               <div>
                 <h2>New Appointment</h2>
                 <p>
-                  Schedule an in-clinic consultation or add a patient directly
-                  to the live queue.
+                  Schedule an in-clinic consultation for an existing or new patient.
                 </p>
               </div>
             </div>
@@ -351,35 +355,13 @@ const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
               </div>
             </div>
 
-            <div className={classes.queueBox}>
-              <div className={classes.queueIcon}>
-                <Zap size={17} fill="currentColor" />
-              </div>
-
-              <div className={classes.queueText}>
-                <strong>Direct Queue Insertion</strong>
-                <span>
-                  Add directly to today’s active waiting room list upon saving
-                </span>
-              </div>
-
-              <span className={classes.queueNumber}>#05 Queue</span>
-
-              <button
-                type="button"
-                className={`${classes.toggle} ${
-                  addToQueue ? classes.toggleOn : ""
-                }`}
-                onClick={() => setAddToQueue((value) => !value)}
-                aria-label="Toggle direct queue insertion"
-              >
-                <span />
-              </button>
-            </div>
-
             <label className={classes.notes}>
               <span>Chief Complaint & Clinical Notes</span>
-              <textarea defaultValue="Recurring mild migraines and seasonal allergy review requested." />
+              <textarea
+                value={clinicalNotes}
+                onChange={(event) => setClinicalNotes(event.target.value)}
+                placeholder="Add relevant clinical notes..."
+              />
             </label>
           </main>
 
@@ -425,3 +407,4 @@ const NewAppointmentModal: React.FC<NewAppointmentModalProps> = ({
 };
 
 export default NewAppointmentModal;
+

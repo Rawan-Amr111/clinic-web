@@ -1,5 +1,5 @@
 import React from "react";
-import { CalendarDays, ChevronDown } from "lucide-react";
+import { CalendarDays } from "lucide-react";
 import classes from "./AppointmentHeader.module.css";
 import type { AppointmentStatus } from "../../../../domain/appointment";
 import { DatePicker } from "antd";
@@ -9,23 +9,36 @@ type AppointmentHeaderProps = {
   selectedDate: Dayjs | null;
   onStatusChange: (status: AppointmentStatus | "") => void;
   onDateChange: (date: Dayjs | null) => void;
+  doctorName?: string | null;
+  onClearDoctorFilter: () => void;
 };
 const AppointmentHeader: React.FC<AppointmentHeaderProps> = ({
   status,
   selectedDate,
   onStatusChange,
   onDateChange,
+  doctorName,
+  onClearDoctorFilter,
 }) => {
   return (
     <>
       <header className={classes.header}>
         <div className={classes.titleContent}>
           <h1>Appointments</h1>
-          <p>Manage today's schedule and upcoming visits.</p>
+          <p>
+            {doctorName
+              ? `Schedule for ${doctorName}`
+              : "Manage today's schedule and upcoming visits."}
+          </p>
         </div>
       </header>
 
       <div className={classes.filters}>
+        {doctorName && (
+          <button type="button" onClick={onClearDoctorFilter}>
+            Clear doctor filter
+          </button>
+        )}
         <DatePicker
           value={selectedDate}
           onChange={onDateChange}
@@ -35,18 +48,20 @@ const AppointmentHeader: React.FC<AppointmentHeaderProps> = ({
           suffixIcon={<CalendarDays size={17} />}
         />
 
-        <button type="button">
-          {status || "All Status"}
-          <ChevronDown size={15} />
-        </button>
-        <button type="button" onClick={() => onStatusChange("")}>
+        <button className={status === "" ? classes.activeFilter : ""} type="button" onClick={() => onStatusChange("")}>
           All Status
         </button>
-        <button type="button" onClick={() => onStatusChange("In Progress")}>
+        <button className={status === "In Progress" ? classes.activeFilter : ""} type="button" onClick={() => onStatusChange("In Progress")}>
           In Progress
         </button>
-        <button type="button" onClick={() => onStatusChange("Waiting")}>
+        <button className={status === "Waiting" ? classes.activeFilter : ""} type="button" onClick={() => onStatusChange("Waiting")}>
           Waiting
+        </button>
+        <button className={status === "Completed" ? classes.activeFilter : ""} type="button" onClick={() => onStatusChange("Completed")}>
+          Completed
+        </button>
+        <button className={status === "Cancelled" ? classes.activeFilter : ""} type="button" onClick={() => onStatusChange("Cancelled")}>
+          Cancelled
         </button>
       </div>
     </>

@@ -118,20 +118,13 @@
   font-weight: 600;
 }
 
-.completeButton {
-  min-width: 76px;
-  height: 33px;
-  border: 0;
-  border-radius: 7px;
-  background: #fff;
-  color: #075fd5;
-  font-size: 0.68rem;
-  font-weight: 700;
-  cursor: pointer;
+.queueActions {
+  display: flex;
+  flex-shrink: 0;
 }
 
-.completeButton:hover {
-  background: #eaf2ff;
+.statusSelect {
+  width: 160px;
 }
 
 .hold .patientInfo,
@@ -186,10 +179,12 @@
     font-size: 0.66rem;
   }
 
-  .completeButton {
-    min-width: 65px;
-    height: 30px;
-    font-size: 0.6rem;
+  .queueActions {
+    width: 135px;
+  }
+
+  .statusSelect {
+    width: 100%;
   }
 
   .status {
@@ -198,8 +193,8 @@
 }
 
 @media (max-width: 390px) {
-  .completeButton {
-    display: none;
+  .queueActions {
+    width: 105px;
   }
 
   .meta {

@@ -53,6 +53,12 @@
   color: #075fd5;
 }
 
+.filters button.activeFilter {
+  border-color: #075fd5;
+  background: #eff6ff;
+  color: #075fd5;
+}
+
 @media (max-width: 650px) {
   .header {
     align-items: flex-start;

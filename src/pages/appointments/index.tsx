@@ -7,12 +7,16 @@ import classes from "./index.module.css";
 import { getAppointments } from "../../services/appointment";
 import { useQuery } from "@tanstack/react-query";
 import { type Dayjs } from "dayjs";
+import { useSearchParams } from "react-router-dom";
 
 const AppointmentsPage: React.FC = () => {
   const [selectedAppointment, setSelectedAppointment] =
     useState<Appointment | null>(null);
   const [status, setStatus] = useState<AppointmentStatus | "">("");
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const doctorId = searchParams.get("doctorId");
+  const doctorName = searchParams.get("doctorName");
 
   const dateFilter = selectedDate?.format("YYYY-MM-DD") ?? null;
   const {
@@ -21,11 +25,13 @@ const AppointmentsPage: React.FC = () => {
     isError,
     error,
   } = useQuery<Appointment[]>({
-    queryKey: ["appointments", dateFilter, status],
+    queryKey: ["appointments", dateFilter, status, true, doctorId],
     queryFn: () =>
       getAppointments({
         date: dateFilter,
         status,
+        includeClosed: true,
+        doctorId,
       }),
     staleTime: 60 * 1000,
   });
@@ -48,6 +54,13 @@ const AppointmentsPage: React.FC = () => {
           selectedDate={selectedDate}
           onStatusChange={setStatus}
           onDateChange={setSelectedDate}
+          doctorName={doctorName}
+          onClearDoctorFilter={() => {
+            const nextParams = new URLSearchParams(searchParams);
+            nextParams.delete("doctorId");
+            nextParams.delete("doctorName");
+            setSearchParams(nextParams);
+          }}
         />
 
         <AppointmentList
@@ -60,6 +73,9 @@ const AppointmentsPage: React.FC = () => {
       {selectedAppointment && (
         <AppointmentDetails
           appointment={selectedAppointment}
+          onAppointmentChange={(updates) =>
+            setSelectedAppointment((current) => current ? { ...current, ...updates } : current)
+          }
           onClose={() => setSelectedAppointment(null)}
         />
       )}

@@ -21,6 +21,8 @@ import {
 } from "../../services/doctors";
 import { useDebounce } from "../../hooks/useDebounce";
 import { Pagination } from "antd";
+import { useNavigate } from "react-router-dom";
+import { getTodayAppointmentCountsByDoctor } from "../../services/dashboard";
 
 const DoctorsPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -30,6 +32,7 @@ const DoctorsPage: React.FC = () => {
   const debouncedSearch = useDebounce(search, 400);
   const [page, setPage] = useState(1);
   const pageSize = 6;
+  const navigate = useNavigate();
   const {
     data: { doctors = [], total = 0 } = {},
     isLoading,
@@ -53,6 +56,16 @@ const DoctorsPage: React.FC = () => {
     queryKey: ["doctor-specialties"],
     queryFn: getSpecialties,
     staleTime: 5 * 60 * 1000,
+  });
+
+  const {
+    data: appointmentCounts = {},
+    isLoading: isLoadingAppointmentCounts,
+    isError: hasAppointmentCountError,
+  } = useQuery({
+    queryKey: ["doctor-appointment-counts"],
+    queryFn: getTodayAppointmentCountsByDoctor,
+    staleTime: 60 * 1000,
   });
 
   const queryClient = useQueryClient();
@@ -123,6 +136,14 @@ const DoctorsPage: React.FC = () => {
       <DoctorsGrid
         doctors={doctors}
         isUpdatingStatus={isUpdatingStatus}
+        appointmentCounts={appointmentCounts}
+        isLoadingAppointments={isLoadingAppointmentCounts}
+        hasAppointmentCountError={hasAppointmentCountError}
+        onViewSchedule={(doctor) =>
+          navigate(
+            `/appointments?doctorId=${encodeURIComponent(doctor.id)}&doctorName=${encodeURIComponent(doctor.name)}`,
+          )
+        }
         onToggleStatus={(doctorId, currentStatus) => {
           const nextStatus = currentStatus === "Active" ? "Inactive" : "Active";
 

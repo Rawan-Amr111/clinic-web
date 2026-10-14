@@ -15,11 +15,18 @@ import TodaySchedule from "./components/todaysschedule/TodaySchedule";
 import DoctorStatus from "./components/doctorstatus/DoctorStatus";
 import NewAppointmentModal from "./components/newappointment/NewAppointmentModal";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { getDashboardStats } from "../../services/dashboard";
 
 const Dashboard: React.FC = () => {
   const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false);
   const navigate = useNavigate();
   const today: Date = new Date();
+  const { data: stats, isLoading: isLoadingStats, isError: isStatsError } = useQuery({
+    queryKey: ["dashboard-stats"],
+    queryFn: getDashboardStats,
+    staleTime: 60 * 1000,
+  });
 
   const formattedDate: string = today.toLocaleDateString("en-US", {
     weekday: "long",
@@ -32,7 +39,7 @@ const Dashboard: React.FC = () => {
     {
       id: 1,
       title: "Today's Appointments",
-      value: "142",
+      value: isLoadingStats ? "…" : isStatsError ? "—" : String(stats?.todayAppointments ?? 0),
       icon: Calendar,
       iconBgColor: "#dbeafe",
       iconColor: "#2563eb",
@@ -40,7 +47,7 @@ const Dashboard: React.FC = () => {
     {
       id: 2,
       title: "Patients Waiting",
-      value: "18",
+      value: isLoadingStats ? "…" : isStatsError ? "—" : String(stats?.patientsWaiting ?? 0),
       icon: UserRound,
       iconBgColor: "#ffe4e6",
       iconColor: "#e11d48",
@@ -48,7 +55,7 @@ const Dashboard: React.FC = () => {
     {
       id: 3,
       title: "Completed Appointments",
-      value: "87",
+      value: isLoadingStats ? "…" : isStatsError ? "—" : String(stats?.completedAppointments ?? 0),
       icon: CheckCircle2,
       iconBgColor: "#00875a",
       iconColor: "#ffffff",
@@ -56,8 +63,7 @@ const Dashboard: React.FC = () => {
     {
       id: 4,
       title: "Avg. Waiting Time",
-      value: "14",
-      unit: "min",
+      value: "N/A",
       icon: Timer,
       iconBgColor: "#e2e8f0",
       iconColor: "#334155",
